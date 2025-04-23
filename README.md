@@ -27,3 +27,11 @@ You can check out the [create-t3-app GitHub repository](https://github.com/t3-os
 ## How do I deploy this?
 
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+
+
+Sterben Notes
+for people cloning: follow the instructions from here https://create.t3.gg/en/usage/first-steps#authentication
+make .env file in root folder: and fill in needed auth. db url: postgresql://neondb_owner:npg_6AKnr3glLcQW@ep-damp-sun-a4hwma2o-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
+When modifying schema: npx prisma db push
+Accessing db: npx prisma studio
+Running dev local host: pnpm run dev
