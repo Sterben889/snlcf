@@ -83,3 +83,11 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+model SiteContent {
+  id           Int      @id
+  heroTitle    String   @default("To Glorify God")
+  heroSubtitle String   @default("by fulfilling the Great Commission")
+  heroImageUrl String   @default("/filter.png")
+  updatedAt    DateTime @updatedAt
+}

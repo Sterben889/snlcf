@@ -1,14 +1,31 @@
-import Image from "next/image";
-import React from "react";
+type HeroSectionProps = {
+  title: string;
+  subtitle: string;
+  backgroundImageUrl: string;
+};
 
-export function HeroSection() {
+export function HeroSection({
+  title,
+  subtitle,
+  backgroundImageUrl,
+}: HeroSectionProps) {
+  const backgroundImage = `linear-gradient(
+    rgba(0, 0, 0, 0.45),
+    rgba(0, 0, 0, 0.45)
+  ), url(${JSON.stringify(backgroundImageUrl)})`;
+
   return (
-    <div className="h-screen w-screen justify-center items-center bg-black">
-      <Image src="/filter.png" alt="" layout="fill" objectFit="cover" />
-      <div className="relative justify-center items-center text-center m-auto">
-        <div className="pt-60 pb-10 font-bold text-8xl text-white">To Glorify God</div>
-        <div className="font-bold text-2xl text-white">by fulfilling the Great Commission</div>
+    <section
+      className="flex min-h-screen w-full items-center justify-center bg-black bg-cover bg-center px-6"
+      style={{
+        backgroundImage,
+      }}
+    >
+      <div className="text-center text-white">
+        <h1 className="text-5xl font-bold md:text-7xl lg:text-8xl">{title}</h1>
+
+        <p className="mt-6 text-xl font-bold md:text-2xl">{subtitle}</p>
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,20 +1,28 @@
 import Image from "next/image";
-import React from "react";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <div>
-      <nav>
-        <div className="relative z-20  pt-4 px-5 p-1 flex items-center">
+    <header className="absolute inset-x-0 top-0 z-50">
+      <nav className="px-5 py-4">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-5"
+          aria-label="Go to homepage"
+        >
           <Image
-            src="/logo.jpg"
-            width="120"
-            height="120" alt={""}          />
-          <div className="hover:text-gray-200 font-bold text-3xl pl-2 w-120 text-white">
+            src="/transparent.png"
+            width={120}
+            height={120}
+            alt="SNLCF Church logo"
+            priority
+          />
+
+          <span className="text-3xl font-bold text-white hover:text-gray-300">
             Saskatoon New Life Community Fellowship
-          </div>
-        </div>
+          </span>
+        </Link>
       </nav>
-    </div>
+    </header>
   );
 }

@@ -1,22 +1,21 @@
-import Link from "next/link";
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { DescSection } from "~/app/_components/DescSection";
+import { HeroSection } from "~/app/_components/herosection";
+import { getSiteContent } from "~/server/site-content";
 
-import { LatestPost } from "~/app/_components/post";
-import { auth } from "~/server/auth";
-import { api, HydrateClient } from "~/trpc/server";
-import { HeroSection } from "./_components/herosection";
-import { DescSection } from "./_components/DescSection";
 export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
-  const session = await auth();
-
-  if (session?.user) {
-    void api.post.getLatest.prefetch();
-  }
+  const content = await getSiteContent();
 
   return (
-    <div>
-      <HeroSection />
-      <DescSection/>
-    </div>
+    <main>
+      <HeroSection
+        title={content.heroTitle}
+        subtitle={content.heroSubtitle}
+        backgroundImageUrl={content.heroImageUrl}
+      />
+
+      <DescSection />
+    </main>
   );
 }

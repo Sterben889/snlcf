@@ -14,5 +14,5 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     redirect("/login");
   }
 
-  return <>{children}</>;
+  return <div className="min-h-screen bg-blue-950 pt-36">{children}</div>;
 }
