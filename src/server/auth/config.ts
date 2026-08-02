@@ -1,56 +1,137 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { type DefaultSession, type NextAuthConfig } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import type { UserRole } from "@prisma/client";
+import { compare } from "bcryptjs";
+import type { DefaultSession, NextAuthConfig } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import { z } from "zod";
 
 import { db } from "~/server/db";
 
-/**
- * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
- * object and keep type safety.
- *
- * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
- */
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      role: UserRole;
     } & DefaultSession["user"];
   }
-
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
 }
 
-/**
- * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
- *
- * @see https://next-auth.js.org/configuration/options
- */
+type AuthenticatedUser = {
+  id: string;
+  name: string | null;
+  email: string;
+  image: string | null;
+  role: UserRole;
+};
+
+function isUserRole(value: unknown): value is UserRole {
+  return value === "ADMIN" || value === "EDITOR";
+}
+
+const credentialsSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
 export const authConfig = {
+  session: {
+    strategy: "jwt",
+  },
+
+  pages: {
+    signIn: "/login",
+  },
+
   providers: [
-    DiscordProvider,
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
-  ],
-  adapter: PrismaAdapter(db),
-  callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
+    Credentials({
+      name: "Email and password",
+
+      credentials: {
+        email: {
+          label: "Email",
+          type: "email",
+          placeholder: "admin@example.com",
+        },
+        password: {
+          label: "Password",
+          type: "password",
+        },
+      },
+
+      async authorize(credentials) {
+        const parsed = credentialsSchema.safeParse(credentials);
+
+        if (!parsed.success) {
+          return null;
+        }
+
+        const email = parsed.data.email.trim().toLowerCase();
+
+        const user = await db.user.findUnique({
+          where: {
+            email,
+          },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            passwordHash: true,
+            role: true,
+            active: true,
+          },
+        });
+
+        if (!user?.active || !user.passwordHash) {
+          return null;
+        }
+
+        const passwordIsCorrect = await compare(
+          parsed.data.password,
+          user.passwordHash,
+        );
+
+        if (!passwordIsCorrect) {
+          return null;
+        }
+
+        const authenticatedUser: AuthenticatedUser = {
+          id: user.id,
+          name: user.name,
+          email: user.email ?? email,
+          image: user.image,
+          role: user.role,
+        };
+
+        return authenticatedUser;
       },
     }),
+  ],
+
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        const authenticatedUser = user as AuthenticatedUser;
+
+        token.id = authenticatedUser.id;
+        token.role = authenticatedUser.role;
+      }
+
+      return token;
+    },
+
+    session({ session, token }) {
+      if (typeof token.id !== "string" || !isUserRole(token.role)) {
+        throw new Error(
+          "Authenticated session token is missing required user fields.",
+        );
+      }
+
+      session.user.id = token.id;
+      session.user.role = token.role;
+
+      return session;
+    },
   },
 } satisfies NextAuthConfig;
