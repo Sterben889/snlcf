@@ -211,6 +211,6 @@ export const getLatestYouTubeStream = unstable_cache(
   fetchLatestYouTubeStream,
   ["snlcf-latest-youtube-stream"],
   {
-    revalidate: 60 * 30,
+    revalidate: 60 * 60 * 24 * 7,
   },
 );
