@@ -20,6 +20,18 @@ export const defaultSiteContent = {
   descLocation: "3532 Fairlight Dr. Saskatoon, SK",
   descButtonText: "Learn more",
   descButtonUrl: "#",
+
+  missionTitle: "O GOD, WITH ALL OUR HEARTS WE LONG FOR YOU.",
+
+  missionTransformation:
+    "Come TRANSFORM US to be Christ-centered, Spirit-empowered, Mission-focused People",
+
+  missionDisciplesTitle: "MULTIPLYING DISCIPLES",
+
+  missionDisciplesSubtitle: "EVERYWHERE",
+
+  missionStatement:
+    "To glorify God by fulfilling the Great Commission through building Christ-committed followers in Saskatoon and beyond.",
 };
 
 export async function getSiteContent() {

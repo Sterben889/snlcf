@@ -68,6 +68,38 @@ const descSectionSchema = z.object({
     ),
 });
 
+const missionSectionSchema = z.object({
+  missionTitle: z
+    .string()
+    .trim()
+    .min(1, "The mission title is required.")
+    .max(250, "The mission title is too long."),
+
+  missionTransformation: z
+    .string()
+    .trim()
+    .min(1, "The transformation message is required.")
+    .max(1000, "The transformation message is too long."),
+
+  missionDisciplesTitle: z
+    .string()
+    .trim()
+    .min(1, "The disciples title is required.")
+    .max(150),
+
+  missionDisciplesSubtitle: z
+    .string()
+    .trim()
+    .min(1, "The disciples subtitle is required.")
+    .max(150),
+
+  missionStatement: z
+    .string()
+    .trim()
+    .min(1, "The mission statement is required.")
+    .max(1500, "The mission statement is too long."),
+});
+
 const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"] as const;
 
 const maximumImageSize = 4 * 1024 * 1024;
@@ -260,6 +292,60 @@ export async function updateDescriptionSection(formData: FormData) {
       descLocation: parsed.data.descLocation,
       descButtonText: parsed.data.descButtonText,
       descButtonUrl: parsed.data.descButtonUrl,
+    },
+  });
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+}
+
+export async function updateMissionSection(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the mission section.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error(
+      "You do not have permission to update the mission section.",
+    );
+  }
+
+  const parsed = missionSectionSchema.safeParse({
+    missionTitle: formData.get("missionTitle"),
+    missionTransformation: formData.get("missionTransformation"),
+    missionDisciplesTitle: formData.get("missionDisciplesTitle"),
+    missionDisciplesSubtitle: formData.get("missionDisciplesSubtitle"),
+    missionStatement: formData.get("missionStatement"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The mission section data is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      missionTitle: parsed.data.missionTitle,
+      missionTransformation: parsed.data.missionTransformation,
+      missionDisciplesTitle: parsed.data.missionDisciplesTitle,
+      missionDisciplesSubtitle: parsed.data.missionDisciplesSubtitle,
+      missionStatement: parsed.data.missionStatement,
+    },
+
+    create: {
+      id: 1,
+      missionTitle: parsed.data.missionTitle,
+      missionTransformation: parsed.data.missionTransformation,
+      missionDisciplesTitle: parsed.data.missionDisciplesTitle,
+      missionDisciplesSubtitle: parsed.data.missionDisciplesSubtitle,
+      missionStatement: parsed.data.missionStatement,
     },
   });
 

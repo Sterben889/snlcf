@@ -9,6 +9,7 @@ export const env = createEnv({
   server: {
     AUTH_SECRET: z.string().min(1),
     DATABASE_URL: z.string().url(),
+    YOUTUBE_API_KEY: z.string().min(1),
     BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -30,6 +31,7 @@ export const env = createEnv({
    */
   runtimeEnv: {
     AUTH_SECRET: process.env.AUTH_SECRET,
+    YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY,
     DATABASE_URL: process.env.DATABASE_URL,
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
     NODE_ENV: process.env.NODE_ENV,

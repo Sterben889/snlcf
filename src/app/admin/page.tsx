@@ -4,7 +4,11 @@
 import { signOut } from "~/server/auth";
 import { getSiteContent } from "~/server/site-content";
 
-import { updateDescriptionSection, updateHomepage } from "./actions";
+import {
+  updateDescriptionSection,
+  updateHomepage,
+  updateMissionSection,
+} from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -343,6 +347,158 @@ export default async function AdminPage() {
                 className="rounded-md bg-blue-700 px-6 py-3 font-semibold text-white hover:bg-blue-800"
               >
                 Save Sunday service section
+              </button>
+            </form>
+          </section>
+          <div className="my-12 border-t border-gray-200" />
+
+          <section>
+            <div>
+              <h2 className="text-2xl font-bold">Mission Section</h2>
+
+              <p className="mt-2 text-gray-600">
+                Edit the church vision and mission messages.
+              </p>
+            </div>
+
+            {/* Mission preview */}
+            <div className="mt-8 rounded-xl bg-blue-950 p-4 sm:p-8">
+              <div className="rounded-xl border border-white/10 bg-blue-900 px-6 py-10 text-center text-white shadow-xl sm:px-10">
+                <h3 className="text-2xl leading-tight font-bold whitespace-pre-line uppercase sm:text-3xl">
+                  {content.missionTitle}
+                </h3>
+
+                <p className="mt-6 text-lg leading-relaxed whitespace-pre-line">
+                  {content.missionTransformation}
+                </p>
+
+                <div className="mt-8">
+                  <p className="text-xl font-bold uppercase sm:text-2xl">
+                    {content.missionDisciplesTitle}
+                  </p>
+
+                  <p className="mt-1 text-lg tracking-wide uppercase">
+                    {content.missionDisciplesSubtitle}
+                  </p>
+                </div>
+
+                <div className="my-8 border-t border-white/25" />
+
+                <p className="text-lg leading-relaxed whitespace-pre-line">
+                  {content.missionStatement}
+                </p>
+              </div>
+            </div>
+
+            {/* Mission form */}
+            <form action={updateMissionSection} className="mt-8 space-y-6">
+              <div>
+                <label
+                  htmlFor="missionTitle"
+                  className="mb-2 block font-semibold"
+                >
+                  Main mission heading
+                </label>
+
+                <textarea
+                  id="missionTitle"
+                  name="missionTitle"
+                  required
+                  rows={3}
+                  maxLength={250}
+                  defaultValue={content.missionTitle}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                />
+
+                <p className="mt-2 text-sm text-gray-500">
+                  Press Enter where you want the heading to break onto a new
+                  line.
+                </p>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="missionTransformation"
+                  className="mb-2 block font-semibold"
+                >
+                  Transformation message
+                </label>
+
+                <textarea
+                  id="missionTransformation"
+                  name="missionTransformation"
+                  required
+                  rows={4}
+                  maxLength={1000}
+                  defaultValue={content.missionTransformation}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                />
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="missionDisciplesTitle"
+                    className="mb-2 block font-semibold"
+                  >
+                    Disciples heading
+                  </label>
+
+                  <input
+                    id="missionDisciplesTitle"
+                    name="missionDisciplesTitle"
+                    type="text"
+                    required
+                    maxLength={150}
+                    defaultValue={content.missionDisciplesTitle}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="missionDisciplesSubtitle"
+                    className="mb-2 block font-semibold"
+                  >
+                    Disciples subtitle
+                  </label>
+
+                  <input
+                    id="missionDisciplesSubtitle"
+                    name="missionDisciplesSubtitle"
+                    type="text"
+                    required
+                    maxLength={150}
+                    defaultValue={content.missionDisciplesSubtitle}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="missionStatement"
+                  className="mb-2 block font-semibold"
+                >
+                  Mission statement
+                </label>
+
+                <textarea
+                  id="missionStatement"
+                  name="missionStatement"
+                  required
+                  rows={5}
+                  maxLength={1500}
+                  defaultValue={content.missionStatement}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="rounded-md bg-blue-700 px-6 py-3 font-semibold text-white hover:bg-blue-800"
+              >
+                Save mission section
               </button>
             </form>
           </section>

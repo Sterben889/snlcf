@@ -98,4 +98,10 @@ model SiteContent {
   descLocation   String @default("3532 Fairlight Dr. Saskatoon, SK")
   descButtonText String @default("Learn more")
   descButtonUrl  String @default("#")
+
+  missionTitle             String @default("O GOD, WITH ALL OUR HEARTS WE LONG FOR YOU.")
+  missionTransformation    String @default("Come TRANSFORM US to be Christ-centered, Spirit-empowered, Mission-focused People")
+  missionDisciplesTitle    String @default("MULTIPLYING DISCIPLES")
+  missionDisciplesSubtitle String @default("EVERYWHERE")
+  missionStatement         String @default("To glorify God by fulfilling the Great Commission through building Christ-committed followers in Saskatoon and beyond.")
 }
