@@ -4,6 +4,8 @@ import { HeroSection } from "~/app/_components/herosection";
 import { MissionSection } from "~/app/_components/MissionSection";
 import { LatestSermonSection } from "~/app/_components/LatestSermonSection";
 import { UpcomingEventsSection } from "~/app/_components/UpcomingEventsSection";
+import { ContactPrayerSection } from "~/app/_components/ContactPrayerSection";
+import { CopyrightFooter } from "~/app/_components/CopyrightFooter";
 import { getSiteContent } from "~/server/site-content";
 
 export const dynamic = "force-dynamic";
@@ -40,6 +42,10 @@ export default async function Home() {
       <LatestSermonSection />
 
       <UpcomingEventsSection />
+
+      <ContactPrayerSection />
+
+      <CopyrightFooter />
     </main>
   );
 }
