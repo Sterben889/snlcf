@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -98,6 +99,30 @@ const missionSectionSchema = z.object({
     .trim()
     .min(1, "The mission statement is required.")
     .max(1500, "The mission statement is too long."),
+});
+
+const churchEventSchema = z.object({
+  eventId: z.string().trim().optional(),
+
+  title: z
+    .string()
+    .trim()
+    .min(1, "The event title is required.")
+    .max(150, "The event title is too long."),
+
+  description: z
+    .string()
+    .trim()
+    .min(1, "The event description is required.")
+    .max(1500, "The event description is too long."),
+
+  location: z.string().trim().max(250, "The location is too long.").optional(),
+
+  startsAt: z.string().trim().min(1, "The event date and time are required."),
+
+  recurrence: z.enum(["NONE", "WEEKLY"]),
+
+  recurrenceEndsAt: z.string().trim().optional(),
 });
 
 const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"] as const;
@@ -346,6 +371,110 @@ export async function updateMissionSection(formData: FormData) {
       missionDisciplesTitle: parsed.data.missionDisciplesTitle,
       missionDisciplesSubtitle: parsed.data.missionDisciplesSubtitle,
       missionStatement: parsed.data.missionStatement,
+    },
+  });
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+}
+
+function parseReginaDateTime(value: string): Date {
+  /*
+   * Saskatchewan uses UTC-06:00 throughout the year.
+   * datetime-local inputs do not contain a timezone, so we add it here.
+   */
+  const valueWithSeconds = value.length === 16 ? `${value}:00` : value;
+
+  const date = new Date(`${valueWithSeconds}-06:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    throw new Error("The event date and time are invalid.");
+  }
+
+  return date;
+}
+
+export async function saveChurchEvent(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to manage events.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to manage events.");
+  }
+
+  const parsed = churchEventSchema.safeParse({
+    eventId: formData.get("eventId") || undefined,
+    title: formData.get("title"),
+    description: formData.get("description"),
+    location: formData.get("location") || undefined,
+    startsAt: formData.get("startsAt"),
+    recurrence: formData.get("recurrence"),
+    recurrenceEndsAt: formData.get("recurrenceEndsAt") || undefined,
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The event information is invalid.",
+    );
+  }
+
+  const startsAt = parseReginaDateTime(parsed.data.startsAt);
+  const published = formData.get("published") === "on";
+
+  const recurrenceEndsAt = parsed.data.recurrenceEndsAt
+    ? parseReginaDateTime(`${parsed.data.recurrenceEndsAt}T23:59`)
+    : null;
+
+  const eventData = {
+    title: parsed.data.title,
+    description: parsed.data.description,
+    location: parsed.data.location || null,
+    startsAt,
+    recurrence: parsed.data.recurrence,
+    recurrenceEndsAt,
+    published,
+  };
+
+  if (parsed.data.eventId) {
+    await db.churchEvent.update({
+      where: {
+        id: parsed.data.eventId,
+      },
+      data: eventData,
+    });
+  } else {
+    await db.churchEvent.create({
+      data: eventData,
+    });
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+}
+
+export async function deleteChurchEvent(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to delete events.");
+  }
+
+  if (session.user.role !== "ADMIN") {
+    throw new Error("Only administrators can delete events.");
+  }
+
+  const eventId = formData.get("eventId");
+
+  if (typeof eventId !== "string" || !eventId) {
+    throw new Error("The event ID is missing.");
+  }
+
+  await db.churchEvent.delete({
+    where: {
+      id: eventId,
     },
   });
 

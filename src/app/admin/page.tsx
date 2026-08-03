@@ -9,6 +9,7 @@ import {
   updateHomepage,
   updateMissionSection,
 } from "./actions";
+import { EventsAdminSection } from "./components/EventsAdminSection";
 
 export const dynamic = "force-dynamic";
 
@@ -502,6 +503,7 @@ export default async function AdminPage() {
               </button>
             </form>
           </section>
+          <EventsAdminSection />
         </div>
       </div>
     </main>

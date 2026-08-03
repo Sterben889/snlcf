@@ -105,3 +105,23 @@ model SiteContent {
   missionDisciplesSubtitle String @default("EVERYWHERE")
   missionStatement         String @default("To glorify God by fulfilling the Great Commission through building Christ-committed followers in Saskatoon and beyond.")
 }
+
+enum EventRecurrence {
+  NONE
+  WEEKLY
+}
+
+model ChurchEvent {
+  id               String          @id @default(cuid())
+  title            String
+  description      String
+  location         String?
+  startsAt         DateTime
+  recurrence       EventRecurrence @default(NONE)
+  recurrenceEndsAt DateTime?
+  published        Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([startsAt])
+}
