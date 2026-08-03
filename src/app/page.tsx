@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { DescSection } from "~/app/_components/DescSection";
 import { HeroSection } from "~/app/_components/herosection";
 import { getSiteContent } from "~/server/site-content";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const content = await getSiteContent();
@@ -15,7 +16,15 @@ export default async function Home() {
         backgroundImageUrl={content.heroImageUrl}
       />
 
-      <DescSection />
+      <DescSection
+        title={content.descTitle}
+        body={content.descBody}
+        imageUrl={content.descImageUrl}
+        serviceTime={content.descTime}
+        serviceLocation={content.descLocation}
+        buttonText={content.descButtonText}
+        buttonUrl={content.descButtonUrl}
+      />
     </main>
   );
 }

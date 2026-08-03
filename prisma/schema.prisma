@@ -90,4 +90,12 @@ model SiteContent {
   heroSubtitle String   @default("by fulfilling the Great Commission")
   heroImageUrl String   @default("/filter.png")
   updatedAt    DateTime @updatedAt
+
+  descTitle      String @default("Sunday Service")
+  descBody       String @default("Join us every Sunday as we worship God, learn from His Word, and grow together as a church family.")
+  descImageUrl   String @default("")
+  descTime       String @default("10:00 am")
+  descLocation   String @default("3532 Fairlight Dr. Saskatoon, SK")
+  descButtonText String @default("Learn more")
+  descButtonUrl  String @default("#")
 }
