@@ -32,6 +32,11 @@ export const defaultSiteContent = {
 
   missionStatement:
     "To glorify God by fulfilling the Great Commission through building Christ-committed followers in Saskatoon and beyond.",
+
+  aboutHeroTitle: "About Us",
+
+  aboutHeroSubtitle:
+    "Learn more about our heart, mission, and the people who make up our church family",
 };
 
 export async function getSiteContent() {

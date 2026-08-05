@@ -125,6 +125,20 @@ const churchEventSchema = z.object({
   recurrenceEndsAt: z.string().trim().optional(),
 });
 
+const aboutHeroSchema = z.object({
+  aboutHeroTitle: z
+    .string()
+    .trim()
+    .min(1, "The About page title is required.")
+    .max(120, "The About page title is too long."),
+
+  aboutHeroSubtitle: z
+    .string()
+    .trim()
+    .min(1, "The About page subtitle is required.")
+    .max(500, "The About page subtitle is too long."),
+});
+
 const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"] as const;
 
 const maximumImageSize = 4 * 1024 * 1024;
@@ -479,5 +493,48 @@ export async function deleteChurchEvent(formData: FormData) {
   });
 
   revalidatePath("/");
+  revalidatePath("/admin");
+}
+export async function updateAboutHero(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the About page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the About page.");
+  }
+
+  const parsed = aboutHeroSchema.safeParse({
+    aboutHeroTitle: formData.get("aboutHeroTitle"),
+    aboutHeroSubtitle: formData.get("aboutHeroSubtitle"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ??
+        "The About page information is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      aboutHeroTitle: parsed.data.aboutHeroTitle,
+      aboutHeroSubtitle: parsed.data.aboutHeroSubtitle,
+    },
+
+    create: {
+      id: 1,
+      aboutHeroTitle: parsed.data.aboutHeroTitle,
+      aboutHeroSubtitle: parsed.data.aboutHeroSubtitle,
+    },
+  });
+
+  revalidatePath("/about");
   revalidatePath("/admin");
 }

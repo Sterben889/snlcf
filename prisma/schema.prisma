@@ -104,6 +104,9 @@ model SiteContent {
   missionDisciplesTitle    String @default("MULTIPLYING DISCIPLES")
   missionDisciplesSubtitle String @default("EVERYWHERE")
   missionStatement         String @default("To glorify God by fulfilling the Great Commission through building Christ-committed followers in Saskatoon and beyond.")
+
+  aboutHeroTitle    String @default("About Us")
+  aboutHeroSubtitle String @default("Learn more about our heart, mission, and the people who make up our church family")
 }
 
 enum EventRecurrence {
