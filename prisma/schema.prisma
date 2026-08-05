@@ -119,6 +119,13 @@ model SiteContent {
   aboutMissionTitle String @default("Purpose and Mission Statement")
 
   aboutVisionTitle String @default("Vision Prayer")
+
+  aboutCtaTitle      String @default("Ready to Join Our Family?")
+  aboutCtaBody       String @default("We'd love to meet you and help you take your next steps in faith. Come as you are — you belong here.")
+  aboutCtaVisitText  String @default("Visit Us This Sunday")
+  aboutCtaVisitUrl   String @default("https://www.google.com/maps/dir/?api=1&destination=3532+Fairlight+Dr,+Saskatoon,+SK+S7M+4T3")
+  aboutCtaEventsText String @default("See Our Events")
+  aboutCtaEventsUrl  String @default("/events")
 }
 
 enum EventRecurrence {
@@ -139,4 +146,32 @@ model ChurchEvent {
   updatedAt        DateTime        @updatedAt
 
   @@index([startsAt])
+}
+
+model StatementOfFaithItem {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  sortOrder   Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sortOrder])
+}
+
+model LeadershipMember {
+  id        String   @id @default(cuid())
+  name      String
+  role      String
+  bio       String
+  email     String?
+  phone     String?
+  imageUrl  String?
+  sortOrder Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder])
 }

@@ -32,6 +32,21 @@ const editorSections = [
     id: "about-vision-editor",
     label: "About — Vision Prayer",
   },
+
+  {
+    id: "statement-of-faith-editor",
+    label: "About — Statement of Faith",
+  },
+
+  {
+    id: "leadership-team-editor",
+    label: "About — Leadership Team",
+  },
+
+  {
+    id: "about-cta-editor",
+    label: "About — Final Call to Action",
+  },
 ] as const;
 
 export function AdminTableOfContents() {

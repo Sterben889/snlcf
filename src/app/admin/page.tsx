@@ -15,6 +15,9 @@ import { AdminTableOfContents } from "./components/AdminTableOfContents";
 import { AboutWhoAdminSection } from "./components/AboutWhoAdminSection";
 import { AboutMissionAdminSection } from "./components/AboutMissionAdminSection";
 import { AboutVisionAdminSection } from "./components/AboutVisionAdminSection";
+import { StatementOfFaithAdminSection } from "./components/StatementOfFaithAdminSection";
+import { LeadershipTeamAdminSection } from "./components/LeadershipTeamAdminSection";
+import { AboutCallToActionAdminSection } from "./components/AboutCallToActionAdminSection";
 
 export const dynamic = "force-dynamic";
 
@@ -546,6 +549,9 @@ export default async function AdminPage() {
             <AboutWhoAdminSection />
             <AboutMissionAdminSection />
             <AboutVisionAdminSection />
+            <StatementOfFaithAdminSection />
+            <LeadershipTeamAdminSection />
+            <AboutCallToActionAdminSection />
           </div>
         </div>
       </div>

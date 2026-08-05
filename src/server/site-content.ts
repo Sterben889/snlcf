@@ -52,6 +52,20 @@ export const defaultSiteContent = {
   aboutMissionTitle: "Purpose and Mission Statement",
 
   aboutVisionTitle: "Vision Prayer",
+
+  aboutCtaTitle: "Ready to Join Our Family?",
+
+  aboutCtaBody:
+    "We'd love to meet you and help you take your next steps in faith. Come as you are — you belong here.",
+
+  aboutCtaVisitText: "Visit Us This Sunday",
+
+  aboutCtaVisitUrl:
+    "https://www.google.com/maps/dir/?api=1&destination=3532+Fairlight+Dr,+Saskatoon,+SK+S7M+4T3",
+
+  aboutCtaEventsText: "See Our Events",
+
+  aboutCtaEventsUrl: "/events",
 };
 
 export async function getSiteContent() {

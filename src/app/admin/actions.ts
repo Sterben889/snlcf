@@ -211,6 +211,109 @@ const aboutVisionSchema = z.object({
     .max(150),
 });
 
+const statementOfFaithSchema = z.object({
+  itemId: z.string().trim().optional(),
+
+  title: z
+    .string()
+    .trim()
+    .min(1, "The concept title is required.")
+    .max(150, "The concept title is too long."),
+
+  description: z
+    .string()
+    .trim()
+    .min(1, "The concept description is required.")
+    .max(2500, "The concept description is too long."),
+
+  sortOrder: z.coerce
+    .number()
+    .int("The display order must be a whole number.")
+    .min(0, "The display order cannot be negative.")
+    .max(9999),
+});
+
+const leadershipMemberSchema = z.object({
+  memberId: z.string().trim().optional(),
+
+  name: z
+    .string()
+    .trim()
+    .min(1, "The leader's name is required.")
+    .max(150, "The leader's name is too long."),
+
+  role: z
+    .string()
+    .trim()
+    .min(1, "The leadership role is required.")
+    .max(150, "The leadership role is too long."),
+
+  bio: z
+    .string()
+    .trim()
+    .min(1, "The biography is required.")
+    .max(2500, "The biography is too long."),
+
+  email: z
+    .string()
+    .trim()
+    .max(254, "The email address is too long.")
+    .refine(
+      (value) =>
+        value.length === 0 || z.string().email().safeParse(value).success,
+      "Enter a valid email address.",
+    ),
+
+  phone: z.string().trim().max(50, "The phone number is too long."),
+
+  sortOrder: z.coerce
+    .number()
+    .int("The display order must be a whole number.")
+    .min(0, "The display order cannot be negative.")
+    .max(9999),
+});
+
+const aboutCtaSchema = z.object({
+  aboutCtaTitle: z
+    .string()
+    .trim()
+    .min(1, "The CTA title is required.")
+    .max(150),
+
+  aboutCtaBody: z
+    .string()
+    .trim()
+    .min(1, "The CTA message is required.")
+    .max(1000),
+
+  aboutCtaVisitText: z
+    .string()
+    .trim()
+    .min(1, "The visit button text is required.")
+    .max(100),
+
+  aboutCtaVisitUrl: z.string().trim().url("Enter a valid map URL.").max(1000),
+
+  aboutCtaEventsText: z
+    .string()
+    .trim()
+    .min(1, "The events button text is required.")
+    .max(100),
+
+  aboutCtaEventsUrl: z
+    .string()
+    .trim()
+    .min(1, "The events page destination is required.")
+    .max(500)
+    .refine(
+      (value) =>
+        value.startsWith("/") ||
+        value.startsWith("https://") ||
+        value.startsWith("http://"),
+      "Use a site path such as /events or a complete URL.",
+    ),
+});
+
 const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"] as const;
 
 const maximumImageSize = 4 * 1024 * 1024;
@@ -752,6 +855,260 @@ export async function updateAboutVisionSection(formData: FormData) {
   });
 
   revalidatePath("/");
+  revalidatePath("/about");
+  revalidatePath("/admin");
+}
+export async function saveStatementOfFaithItem(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to manage the Statement of Faith.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error(
+      "You do not have permission to manage the Statement of Faith.",
+    );
+  }
+
+  const parsed = statementOfFaithSchema.safeParse({
+    itemId: formData.get("itemId") || undefined,
+    title: formData.get("title"),
+    description: formData.get("description"),
+    sortOrder: formData.get("sortOrder"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ??
+        "The Statement of Faith concept is invalid.",
+    );
+  }
+
+  const data = {
+    title: parsed.data.title,
+    description: parsed.data.description,
+    sortOrder: parsed.data.sortOrder,
+    published: formData.get("published") === "on",
+  };
+
+  if (parsed.data.itemId) {
+    await db.statementOfFaithItem.update({
+      where: {
+        id: parsed.data.itemId,
+      },
+      data,
+    });
+  } else {
+    await db.statementOfFaithItem.create({
+      data,
+    });
+  }
+
+  revalidatePath("/about");
+  revalidatePath("/admin");
+}
+
+export async function deleteStatementOfFaithItem(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error(
+      "You must be signed in to delete a Statement of Faith concept.",
+    );
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to delete this concept.");
+  }
+
+  const itemId = formData.get("itemId");
+
+  if (typeof itemId !== "string" || itemId.length === 0) {
+    throw new Error("The Statement of Faith item ID is missing.");
+  }
+
+  await db.statementOfFaithItem.delete({
+    where: {
+      id: itemId,
+    },
+  });
+
+  revalidatePath("/about");
+  revalidatePath("/admin");
+}
+export async function saveLeadershipMember(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to manage the leadership team.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error(
+      "You do not have permission to manage the leadership team.",
+    );
+  }
+
+  const parsed = leadershipMemberSchema.safeParse({
+    memberId: formData.get("memberId") || undefined,
+    name: formData.get("name"),
+    role: formData.get("role"),
+    bio: formData.get("bio"),
+    email: formData.get("email") ?? "",
+    phone: formData.get("phone") ?? "",
+    sortOrder: formData.get("sortOrder"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ??
+        "The leadership member information is invalid.",
+    );
+  }
+
+  const existingMember = parsed.data.memberId
+    ? await db.leadershipMember.findUnique({
+        where: {
+          id: parsed.data.memberId,
+        },
+        select: {
+          imageUrl: true,
+        },
+      })
+    : null;
+
+  let imageUrl = existingMember?.imageUrl ?? null;
+
+  if (formData.get("removeImage") === "on") {
+    imageUrl = null;
+  }
+
+  const image = formData.get("image");
+
+  if (image instanceof File && image.size > 0) {
+    if (
+      !acceptedImageTypes.includes(
+        image.type as (typeof acceptedImageTypes)[number],
+      )
+    ) {
+      throw new Error("The image must be a JPG, PNG, or WebP file.");
+    }
+
+    if (image.size > maximumImageSize) {
+      throw new Error("The image is larger than the permitted upload size.");
+    }
+
+    if (!env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN is missing from the environment.");
+    }
+
+    const safeFilename = image.name
+      .replace(/[^a-zA-Z0-9._-]/g, "-")
+      .toLowerCase();
+
+    const blob = await put(`leadership/${safeFilename}`, image, {
+      access: "public",
+      addRandomSuffix: true,
+    });
+
+    imageUrl = blob.url;
+  }
+
+  const data = {
+    name: parsed.data.name,
+    role: parsed.data.role,
+    bio: parsed.data.bio,
+    email: parsed.data.email || null,
+    phone: parsed.data.phone || null,
+    imageUrl,
+    sortOrder: parsed.data.sortOrder,
+    published: formData.get("published") === "on",
+  };
+
+  if (parsed.data.memberId) {
+    await db.leadershipMember.update({
+      where: {
+        id: parsed.data.memberId,
+      },
+      data,
+    });
+  } else {
+    await db.leadershipMember.create({
+      data,
+    });
+  }
+
+  revalidatePath("/about");
+  revalidatePath("/admin");
+}
+
+export async function deleteLeadershipMember(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to delete a leadership member.");
+  }
+
+  if (session.user.role !== "ADMIN") {
+    throw new Error("Only administrators can delete leadership members.");
+  }
+
+  const memberId = formData.get("memberId");
+
+  if (typeof memberId !== "string" || memberId.length === 0) {
+    throw new Error("The leadership member ID is missing.");
+  }
+
+  await db.leadershipMember.delete({
+    where: {
+      id: memberId,
+    },
+  });
+
+  revalidatePath("/about");
+  revalidatePath("/admin");
+}
+export async function updateAboutCallToAction(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the About page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the About page.");
+  }
+
+  const parsed = aboutCtaSchema.safeParse({
+    aboutCtaTitle: formData.get("aboutCtaTitle"),
+    aboutCtaBody: formData.get("aboutCtaBody"),
+    aboutCtaVisitText: formData.get("aboutCtaVisitText"),
+    aboutCtaVisitUrl: formData.get("aboutCtaVisitUrl"),
+    aboutCtaEventsText: formData.get("aboutCtaEventsText"),
+    aboutCtaEventsUrl: formData.get("aboutCtaEventsUrl"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ??
+        "The call-to-action section is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: parsed.data,
+
+    create: {
+      id: 1,
+      ...parsed.data,
+    },
+  });
+
   revalidatePath("/about");
   revalidatePath("/admin");
 }

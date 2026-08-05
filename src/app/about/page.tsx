@@ -5,6 +5,9 @@ import { AboutWhoSection } from "~/app/_components/AboutWhoSection";
 import { getSiteContent } from "~/server/site-content";
 import { CopyrightFooter } from "../_components/CopyrightFooter";
 import { AboutVisionPrayerSection } from "../_components/AboutVisionPrayerSection";
+import { StatementOfFaithSection } from "~/app/_components/StatementOfFaithSection";
+import { LeadershipTeamSection } from "../_components/LeadershipTeamSection";
+import { AboutCallToActionSection } from "../_components/AboutCallToActionSection";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +39,19 @@ export default async function AboutPage() {
         transformation={content.missionTransformation}
         disciplesTitle={content.missionDisciplesTitle}
         disciplesSubtitle={content.missionDisciplesSubtitle}
+      />
+
+      <StatementOfFaithSection />
+
+      <LeadershipTeamSection />
+
+      <AboutCallToActionSection
+        title={content.aboutCtaTitle}
+        body={content.aboutCtaBody}
+        visitButtonText={content.aboutCtaVisitText}
+        visitButtonUrl={content.aboutCtaVisitUrl}
+        eventsButtonText={content.aboutCtaEventsText}
+        eventsButtonUrl={content.aboutCtaEventsUrl}
       />
 
       <CopyrightFooter />
