@@ -139,6 +139,78 @@ const aboutHeroSchema = z.object({
     .max(500, "The About page subtitle is too long."),
 });
 
+const aboutWhoSchema = z.object({
+  aboutWhoTitle: z
+    .string()
+    .trim()
+    .min(1, "The section title is required.")
+    .max(120, "The section title is too long."),
+
+  aboutWhoParagraph1: z
+    .string()
+    .trim()
+    .min(1, "The first paragraph is required.")
+    .max(2000, "The first paragraph is too long."),
+
+  aboutWhoParagraph2: z
+    .string()
+    .trim()
+    .min(1, "The second paragraph is required.")
+    .max(2000, "The second paragraph is too long."),
+
+  aboutWhoParagraph3: z
+    .string()
+    .trim()
+    .min(1, "The third paragraph is required.")
+    .max(2000, "The third paragraph is too long."),
+});
+
+const aboutMissionSchema = z.object({
+  aboutMissionTitle: z
+    .string()
+    .trim()
+    .min(1, "The section title is required.")
+    .max(150, "The section title is too long."),
+
+  missionStatement: z
+    .string()
+    .trim()
+    .min(1, "The mission statement is required.")
+    .max(1500, "The mission statement is too long."),
+});
+
+const aboutVisionSchema = z.object({
+  aboutVisionTitle: z
+    .string()
+    .trim()
+    .min(1, "The section title is required.")
+    .max(150, "The section title is too long."),
+
+  missionTitle: z
+    .string()
+    .trim()
+    .min(1, "The vision prayer heading is required.")
+    .max(250, "The vision prayer heading is too long."),
+
+  missionTransformation: z
+    .string()
+    .trim()
+    .min(1, "The transformation message is required.")
+    .max(1000, "The transformation message is too long."),
+
+  missionDisciplesTitle: z
+    .string()
+    .trim()
+    .min(1, "The disciples heading is required.")
+    .max(150),
+
+  missionDisciplesSubtitle: z
+    .string()
+    .trim()
+    .min(1, "The disciples subtitle is required.")
+    .max(150),
+});
+
 const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"] as const;
 
 const maximumImageSize = 4 * 1024 * 1024;
@@ -535,6 +607,151 @@ export async function updateAboutHero(formData: FormData) {
     },
   });
 
+  revalidatePath("/about");
+  revalidatePath("/admin");
+}
+export async function updateAboutWhoSection(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the About page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the About page.");
+  }
+
+  const parsed = aboutWhoSchema.safeParse({
+    aboutWhoTitle: formData.get("aboutWhoTitle"),
+    aboutWhoParagraph1: formData.get("aboutWhoParagraph1"),
+    aboutWhoParagraph2: formData.get("aboutWhoParagraph2"),
+    aboutWhoParagraph3: formData.get("aboutWhoParagraph3"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The Who We Are section is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      aboutWhoTitle: parsed.data.aboutWhoTitle,
+      aboutWhoParagraph1: parsed.data.aboutWhoParagraph1,
+      aboutWhoParagraph2: parsed.data.aboutWhoParagraph2,
+      aboutWhoParagraph3: parsed.data.aboutWhoParagraph3,
+    },
+
+    create: {
+      id: 1,
+      aboutWhoTitle: parsed.data.aboutWhoTitle,
+      aboutWhoParagraph1: parsed.data.aboutWhoParagraph1,
+      aboutWhoParagraph2: parsed.data.aboutWhoParagraph2,
+      aboutWhoParagraph3: parsed.data.aboutWhoParagraph3,
+    },
+  });
+
+  revalidatePath("/about");
+  revalidatePath("/admin");
+}
+export async function updateAboutMissionSection(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the About page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the About page.");
+  }
+
+  const parsed = aboutMissionSchema.safeParse({
+    aboutMissionTitle: formData.get("aboutMissionTitle"),
+    missionStatement: formData.get("missionStatement"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ??
+        "The mission section information is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      aboutMissionTitle: parsed.data.aboutMissionTitle,
+      missionStatement: parsed.data.missionStatement,
+    },
+
+    create: {
+      id: 1,
+      aboutMissionTitle: parsed.data.aboutMissionTitle,
+      missionStatement: parsed.data.missionStatement,
+    },
+  });
+
+  revalidatePath("/");
+  revalidatePath("/about");
+  revalidatePath("/admin");
+}
+export async function updateAboutVisionSection(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the About page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the About page.");
+  }
+
+  const parsed = aboutVisionSchema.safeParse({
+    aboutVisionTitle: formData.get("aboutVisionTitle"),
+    missionTitle: formData.get("missionTitle"),
+    missionTransformation: formData.get("missionTransformation"),
+    missionDisciplesTitle: formData.get("missionDisciplesTitle"),
+    missionDisciplesSubtitle: formData.get("missionDisciplesSubtitle"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ??
+        "The Vision Prayer section is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      aboutVisionTitle: parsed.data.aboutVisionTitle,
+      missionTitle: parsed.data.missionTitle,
+      missionTransformation: parsed.data.missionTransformation,
+      missionDisciplesTitle: parsed.data.missionDisciplesTitle,
+      missionDisciplesSubtitle: parsed.data.missionDisciplesSubtitle,
+    },
+
+    create: {
+      id: 1,
+      aboutVisionTitle: parsed.data.aboutVisionTitle,
+      missionTitle: parsed.data.missionTitle,
+      missionTransformation: parsed.data.missionTransformation,
+      missionDisciplesTitle: parsed.data.missionDisciplesTitle,
+      missionDisciplesSubtitle: parsed.data.missionDisciplesSubtitle,
+    },
+  });
+
+  revalidatePath("/");
   revalidatePath("/about");
   revalidatePath("/admin");
 }

@@ -37,6 +37,21 @@ export const defaultSiteContent = {
 
   aboutHeroSubtitle:
     "Learn more about our heart, mission, and the people who make up our church family",
+
+  aboutWhoTitle: "Who We Are",
+
+  aboutWhoParagraph1:
+    "Saskatoon New Life Community Fellowship is a vibrant, Christ-centered church family located in the heart of Saskatoon, Saskatchewan. We are a community of believers who have been transformed by the love of Jesus Christ and are passionate about sharing that love with others.",
+
+  aboutWhoParagraph2:
+    "Our church family comes from diverse backgrounds, ages, and walks of life, but we are united by our common faith in Jesus Christ. We believe that every person has value and worth in God's eyes, and we strive to create an environment where everyone feels welcomed, loved, and accepted.",
+
+  aboutWhoParagraph3:
+    "Whether you're taking your first steps in faith, have been walking with Jesus for years, or are simply curious about Christianity, we invite you to join us as we grow together in our relationship with God and with one another.",
+
+  aboutMissionTitle: "Purpose and Mission Statement",
+
+  aboutVisionTitle: "Vision Prayer",
 };
 
 export async function getSiteContent() {

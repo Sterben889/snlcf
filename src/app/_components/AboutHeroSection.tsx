@@ -14,8 +14,6 @@ export function AboutHeroSection({ title, subtitle }: AboutHeroSectionProps) {
         <p className="mx-auto mt-6 max-w-3xl text-xl leading-relaxed whitespace-pre-line text-blue-100 sm:text-2xl">
           {subtitle}
         </p>
-
-        <div className="mx-auto mt-9 h-1 w-24 rounded-full bg-white/40" />
       </div>
     </section>
   );

@@ -1,9 +1,11 @@
-import "~/styles/globals.css";
+import "../styles/globals.css";
 
-import { type Metadata } from "next";
+import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import Navbar from "./navbar";
+
 import { TRPCReactProvider } from "~/trpc/react";
+
+import Navbar from "./navbar";
 
 export const metadata: Metadata = {
   title: "Saskatoon New Life Community Fellowship",
@@ -18,11 +20,14 @@ const geist = Geist({
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="en" className="{`${geist.variable}`} scroll-smooth">
+    <html lang="en" className={`${geist.variable} scroll-smooth`}>
       <body>
         <Navbar />
+
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>
     </html>

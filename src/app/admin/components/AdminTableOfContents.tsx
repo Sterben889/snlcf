@@ -19,6 +19,19 @@ const editorSections = [
     id: "about-editor",
     label: "About Page",
   },
+  {
+    id: "about-who-editor",
+    label: "About — Who We Are",
+  },
+
+  {
+    id: "about-mission-editor",
+    label: "About — Purpose & Mission",
+  },
+  {
+    id: "about-vision-editor",
+    label: "About — Vision Prayer",
+  },
 ] as const;
 
 export function AdminTableOfContents() {

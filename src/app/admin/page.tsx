@@ -12,6 +12,9 @@ import {
 import { EventsAdminSection } from "./components/EventsAdminSection";
 import { AboutPageAdminSection } from "./components/AboutPageAdminSection";
 import { AdminTableOfContents } from "./components/AdminTableOfContents";
+import { AboutWhoAdminSection } from "./components/AboutWhoAdminSection";
+import { AboutMissionAdminSection } from "./components/AboutMissionAdminSection";
+import { AboutVisionAdminSection } from "./components/AboutVisionAdminSection";
 
 export const dynamic = "force-dynamic";
 
@@ -539,6 +542,10 @@ export default async function AdminPage() {
             <div id="about-editor" className="scroll-mt-6">
               <AboutPageAdminSection />
             </div>
+
+            <AboutWhoAdminSection />
+            <AboutMissionAdminSection />
+            <AboutVisionAdminSection />
           </div>
         </div>
       </div>
