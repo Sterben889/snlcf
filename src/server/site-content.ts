@@ -66,6 +66,11 @@ export const defaultSiteContent = {
   aboutCtaEventsText: "See Our Events",
 
   aboutCtaEventsUrl: "/events",
+
+  eventsHeroTitle: "Upcoming Events",
+
+  eventsHeroSubtitle:
+    "See what's coming up and find a place to connect with our community.",
 };
 
 export async function getSiteContent() {

@@ -126,6 +126,9 @@ model SiteContent {
   aboutCtaVisitUrl   String @default("https://www.google.com/maps/dir/?api=1&destination=3532+Fairlight+Dr,+Saskatoon,+SK+S7M+4T3")
   aboutCtaEventsText String @default("See Our Events")
   aboutCtaEventsUrl  String @default("/events")
+
+  eventsHeroTitle    String @default("Upcoming Events")
+  eventsHeroSubtitle String @default("See what's coming up and find a place to connect with our community.")
 }
 
 enum EventRecurrence {

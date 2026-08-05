@@ -267,7 +267,7 @@ export async function UpcomingEventsSection() {
 
         <div className="mt-12 flex justify-center">
           <Link
-            href="/"
+            href="/events"
             className="inline-flex min-w-60 items-center justify-center rounded-full bg-blue-950 px-8 py-4 text-lg font-bold tracking-wide text-white shadow-md transition duration-200 hover:-translate-y-0.5 hover:bg-blue-900"
           >
             All Events

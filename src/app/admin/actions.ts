@@ -314,6 +314,20 @@ const aboutCtaSchema = z.object({
     ),
 });
 
+const eventsHeroSchema = z.object({
+  eventsHeroTitle: z
+    .string()
+    .trim()
+    .min(1, "The Events page title is required.")
+    .max(150, "The Events page title is too long."),
+
+  eventsHeroSubtitle: z
+    .string()
+    .trim()
+    .min(1, "The Events page subtitle is required.")
+    .max(500, "The Events page subtitle is too long."),
+});
+
 const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"] as const;
 
 const maximumImageSize = 4 * 1024 * 1024;
@@ -1110,5 +1124,47 @@ export async function updateAboutCallToAction(formData: FormData) {
   });
 
   revalidatePath("/about");
+  revalidatePath("/admin");
+}
+export async function updateEventsHero(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the Events page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the Events page.");
+  }
+
+  const parsed = eventsHeroSchema.safeParse({
+    eventsHeroTitle: formData.get("eventsHeroTitle"),
+    eventsHeroSubtitle: formData.get("eventsHeroSubtitle"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The Events page header is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      eventsHeroTitle: parsed.data.eventsHeroTitle,
+      eventsHeroSubtitle: parsed.data.eventsHeroSubtitle,
+    },
+
+    create: {
+      id: 1,
+      eventsHeroTitle: parsed.data.eventsHeroTitle,
+      eventsHeroSubtitle: parsed.data.eventsHeroSubtitle,
+    },
+  });
+
+  revalidatePath("/events");
   revalidatePath("/admin");
 }

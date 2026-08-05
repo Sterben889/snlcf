@@ -7,7 +7,8 @@ import { usePathname } from "next/navigation";
 export default function Navbar() {
   const pathname = usePathname();
 
-  const useLightNavbar = pathname.startsWith("/about");
+  const useLightNavbar =
+    pathname.startsWith("/about") || pathname.startsWith("/events");
 
   return (
     <header
