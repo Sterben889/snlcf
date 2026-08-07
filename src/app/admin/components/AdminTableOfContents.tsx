@@ -88,6 +88,21 @@ const editorGroups = [
       },
     ],
   },
+
+  {
+    id: "gather-page-group",
+    label: "Gather Page",
+    sections: [
+      {
+        id: "gather-page-header-editor",
+        label: "Page Header",
+      },
+      {
+        id: "gather-ways-editor",
+        label: "Ways to Gather",
+      },
+    ],
+  },
 ] as const;
 
 function ChevronIcon() {

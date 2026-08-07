@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use server";
 
-import { put } from "@vercel/blob";
+import { del, put } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -404,6 +406,54 @@ const giveThankYouSchema = z.object({
     .trim()
     .min(1, "The thank-you message is required.")
     .max(1500, "The thank-you message is too long."),
+});
+
+const gatherHeroSchema = z.object({
+  gatherHeroTitle: z
+    .string()
+    .trim()
+    .min(1, "The Gather page title is required.")
+    .max(150, "The Gather page title is too long."),
+
+  gatherHeroSubtitle: z
+    .string()
+    .trim()
+    .min(1, "The Gather page subtitle is required.")
+    .max(500, "The Gather page subtitle is too long."),
+});
+
+const gatherGroupSchema = z.object({
+  groupId: z.string().trim().optional(),
+
+  title: z.string().trim().min(1, "The gathering title is required.").max(150),
+
+  schedule: z
+    .string()
+    .trim()
+    .min(1, "The gathering schedule is required.")
+    .max(200),
+
+  location: z
+    .string()
+    .trim()
+    .min(1, "The gathering location is required.")
+    .max(250),
+
+  description: z
+    .string()
+    .trim()
+    .min(1, "The gathering description is required.")
+    .max(3000),
+
+  sortOrder: z.coerce.number().int().min(0).max(9999),
+});
+
+const gatherWaysTitleSchema = z.object({
+  gatherWaysTitle: z
+    .string()
+    .trim()
+    .min(1, "The section title is required.")
+    .max(150),
 });
 
 const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"] as const;
@@ -1494,5 +1544,339 @@ export async function updateGiveThankYou(formData: FormData) {
   });
 
   revalidatePath("/give");
+  revalidatePath("/admin");
+}
+export async function updateGatherHero(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the Gather page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the Gather page.");
+  }
+
+  const parsed = gatherHeroSchema.safeParse({
+    gatherHeroTitle: formData.get("gatherHeroTitle"),
+    gatherHeroSubtitle: formData.get("gatherHeroSubtitle"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The Gather page header is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      gatherHeroTitle: parsed.data.gatherHeroTitle,
+
+      gatherHeroSubtitle: parsed.data.gatherHeroSubtitle,
+    },
+
+    create: {
+      id: 1,
+
+      gatherHeroTitle: parsed.data.gatherHeroTitle,
+
+      gatherHeroSubtitle: parsed.data.gatherHeroSubtitle,
+    },
+  });
+
+  revalidatePath("/gather");
+  revalidatePath("/admin");
+}
+export async function updateGatherWaysTitle(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to edit the Gather page.");
+  }
+
+  const parsed = gatherWaysTitleSchema.safeParse({
+    gatherWaysTitle: formData.get("gatherWaysTitle"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The section title is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      gatherWaysTitle: parsed.data.gatherWaysTitle,
+    },
+
+    create: {
+      id: 1,
+      gatherWaysTitle: parsed.data.gatherWaysTitle,
+    },
+  });
+
+  revalidatePath("/gather");
+  revalidatePath("/admin");
+}
+
+export async function saveGatherGroup(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to manage gatherings.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to manage gatherings.");
+  }
+
+  const parsed = gatherGroupSchema.safeParse({
+    groupId: formData.get("groupId") || undefined,
+    title: formData.get("title"),
+    schedule: formData.get("schedule"),
+    location: formData.get("location"),
+    description: formData.get("description"),
+    sortOrder: formData.get("sortOrder"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ??
+        "The gathering information is invalid.",
+    );
+  }
+
+  const newImages = formData
+    .getAll("images")
+    .filter((value): value is File => value instanceof File && value.size > 0);
+
+  let existingImages: {
+    id: string;
+    sortOrder: number;
+  }[] = [];
+
+  if (parsed.data.groupId) {
+    const existingGroup = await db.gatherGroup.findUnique({
+      where: {
+        id: parsed.data.groupId,
+      },
+      include: {
+        images: {
+          select: {
+            id: true,
+            sortOrder: true,
+          },
+        },
+      },
+    });
+
+    if (!existingGroup) {
+      throw new Error("The gathering could not be found.");
+    }
+
+    existingImages = existingGroup.images;
+  }
+
+  if (existingImages.length + newImages.length > 10) {
+    throw new Error(
+      `A gathering can contain a maximum of 10 images. This gathering currently has ${existingImages.length}.`,
+    );
+  }
+
+  for (const image of newImages) {
+    if (
+      !acceptedImageTypes.includes(
+        image.type as (typeof acceptedImageTypes)[number],
+      )
+    ) {
+      throw new Error("Images must be JPG, PNG, or WebP files.");
+    }
+
+    if (image.size > maximumImageSize) {
+      throw new Error(
+        "One of the images is larger than the permitted upload size.",
+      );
+    }
+  }
+
+  let groupId = parsed.data.groupId;
+
+  if (groupId) {
+    await db.gatherGroup.update({
+      where: {
+        id: groupId,
+      },
+      data: {
+        title: parsed.data.title,
+        schedule: parsed.data.schedule,
+        location: parsed.data.location,
+        description: parsed.data.description,
+        sortOrder: parsed.data.sortOrder,
+        published: formData.get("published") === "on",
+      },
+    });
+  } else {
+    const newGroup = await db.gatherGroup.create({
+      data: {
+        title: parsed.data.title,
+        schedule: parsed.data.schedule,
+        location: parsed.data.location,
+        description: parsed.data.description,
+        sortOrder: parsed.data.sortOrder,
+        published: formData.get("published") === "on",
+      },
+    });
+
+    groupId = newGroup.id;
+  }
+
+  if (!groupId) {
+    throw new Error("The gathering could not be created.");
+  }
+
+  if (newImages.length > 0) {
+    if (!env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN is missing from the environment.");
+    }
+
+    const highestExistingOrder =
+      existingImages.length > 0
+        ? Math.max(...existingImages.map((image) => image.sortOrder))
+        : -1;
+
+    for (let index = 0; index < newImages.length; index += 1) {
+      const image = newImages[index];
+
+      if (!image) {
+        continue;
+      }
+
+      const safeFilename = image.name
+        .replace(/[^a-zA-Z0-9._-]/g, "-")
+        .toLowerCase();
+
+      const blob = await put(`gather/${groupId}/${safeFilename}`, image, {
+        access: "public",
+        addRandomSuffix: true,
+      });
+
+      await db.gatherGroupImage.create({
+        data: {
+          groupId,
+          imageUrl: blob.url,
+          sortOrder: highestExistingOrder + index + 1,
+        },
+      });
+    }
+  }
+
+  revalidatePath("/gather");
+  revalidatePath("/admin");
+}
+
+export async function deleteGatherGroupImage(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to manage gathering images.");
+  }
+
+  const imageId = formData.get("imageId");
+
+  if (typeof imageId !== "string" || imageId.length === 0) {
+    throw new Error("The image ID is missing.");
+  }
+
+  const image = await db.gatherGroupImage.findUnique({
+    where: {
+      id: imageId,
+    },
+  });
+
+  if (!image) {
+    throw new Error("The image could not be found.");
+  }
+
+  await db.gatherGroupImage.delete({
+    where: {
+      id: imageId,
+    },
+  });
+
+  try {
+    await del(image.imageUrl);
+  } catch (error) {
+    console.error("Unable to remove Gather image from Blob storage:", error);
+  }
+
+  revalidatePath("/gather");
+  revalidatePath("/admin");
+}
+
+export async function deleteGatherGroup(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in.");
+  }
+
+  if (session.user.role !== "ADMIN") {
+    throw new Error("Only administrators can delete gatherings.");
+  }
+
+  const groupId = formData.get("groupId");
+
+  if (typeof groupId !== "string" || groupId.length === 0) {
+    throw new Error("The gathering ID is missing.");
+  }
+
+  const group = await db.gatherGroup.findUnique({
+    where: {
+      id: groupId,
+    },
+    include: {
+      images: {
+        select: {
+          imageUrl: true,
+        },
+      },
+    },
+  });
+
+  if (!group) {
+    throw new Error("The gathering could not be found.");
+  }
+
+  await db.gatherGroup.delete({
+    where: {
+      id: groupId,
+    },
+  });
+
+  if (group.images.length > 0) {
+    try {
+      await del(group.images.map((image) => image.imageUrl));
+    } catch (error) {
+      console.error("Unable to remove Gather images from Blob storage:", error);
+    }
+  }
+
+  revalidatePath("/gather");
   revalidatePath("/admin");
 }

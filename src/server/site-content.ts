@@ -87,6 +87,13 @@ export const defaultSiteContent = {
 
   giveThanksBody:
     "Every gift, no matter the size, makes a difference in the lives of those we serve. Thank you for partnering with us in ministry.",
+
+  gatherHeroTitle: "Gather",
+
+  gatherHeroSubtitle:
+    "There's a place for you at our table. Find a gathering to connect, grow, and belong.",
+
+  gatherWaysTitle: "Ways to Gather",
 };
 
 export async function getSiteContent() {

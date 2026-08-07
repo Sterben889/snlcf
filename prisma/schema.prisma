@@ -141,6 +141,10 @@ model SiteContent {
   giveThanksTitle String @default("Thank You for Your Generosity")
   giveThanksBody  String @default("Every gift, no matter the size, makes a difference in the lives of those we serve. Thank you for partnering with us in ministry.")
 
+  gatherHeroTitle    String @default("Gather")
+  gatherHeroSubtitle String @default("There's a place for you at our table. Find a gathering to connect, grow, and belong.")
+
+  gatherWaysTitle String @default("Ways to Gather")
 }
 
 enum EventRecurrence {
@@ -210,4 +214,31 @@ model GivingMethod {
   updatedAt   DateTime         @updatedAt
 
   @@index([sortOrder])
+}
+
+model GatherGroup {
+  id          String             @id @default(cuid())
+  title       String
+  schedule    String
+  location    String
+  description String
+  sortOrder   Int                @default(0)
+  published   Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  images      GatherGroupImage[]
+
+  @@index([sortOrder])
+}
+
+model GatherGroupImage {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  groupId String
+  group   GatherGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId, sortOrder])
 }
