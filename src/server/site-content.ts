@@ -71,6 +71,22 @@ export const defaultSiteContent = {
 
   eventsHeroSubtitle:
     "See what's coming up and find a place to connect with our community.",
+
+  giveHeroTitle: "Give",
+
+  giveHeroSubtitle:
+    "Your generosity helps us fulfill our mission and bless our community",
+
+  giveVerseReference: "Malachi 3:10",
+
+  giveVerseText:
+    "“Bring the whole tithe into the storehouse, that there may be food in my house. Test me in this,” says the Lord Almighty, “and see if I will not throw open the floodgates of heaven and pour out so much blessing that there will not be room enough to store it.”",
+  giveWaysTitle: "Ways of Giving",
+
+  giveThanksTitle: "Thank You for Your Generosity",
+
+  giveThanksBody:
+    "Every gift, no matter the size, makes a difference in the lives of those we serve. Thank you for partnering with us in ministry.",
 };
 
 export async function getSiteContent() {

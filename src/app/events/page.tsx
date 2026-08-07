@@ -2,6 +2,7 @@
 import { EventsHeroSection } from "~/app/_components/EventsHeroSection";
 import { getSiteContent } from "~/server/site-content";
 import { EventsCalendarSection } from "../_components/EventsCalendarSection";
+import { CopyrightFooter } from "../_components/CopyrightFooter";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ export default async function EventsPage() {
       />
 
       <EventsCalendarSection />
+      <CopyrightFooter />
     </main>
   );
 }

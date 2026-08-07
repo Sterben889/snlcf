@@ -328,6 +328,84 @@ const eventsHeroSchema = z.object({
     .max(500, "The Events page subtitle is too long."),
 });
 
+const giveHeroSchema = z.object({
+  giveHeroTitle: z
+    .string()
+    .trim()
+    .min(1, "The Give page title is required.")
+    .max(150, "The Give page title is too long."),
+
+  giveHeroSubtitle: z
+    .string()
+    .trim()
+    .min(1, "The Give page subtitle is required.")
+    .max(500, "The Give page subtitle is too long."),
+});
+
+const giveScriptureSchema = z.object({
+  giveVerseReference: z
+    .string()
+    .trim()
+    .min(1, "The Scripture reference is required.")
+    .max(100, "The Scripture reference is too long."),
+
+  giveVerseText: z
+    .string()
+    .trim()
+    .min(1, "The Scripture text is required.")
+    .max(3000, "The Scripture text is too long."),
+});
+
+const givingMethodSchema = z.object({
+  methodId: z.string().trim().optional(),
+
+  title: z
+    .string()
+    .trim()
+    .min(1, "The giving method title is required.")
+    .max(150),
+
+  description: z
+    .string()
+    .trim()
+    .min(1, "The description is required.")
+    .max(1500),
+
+  detail: z
+    .string()
+    .trim()
+    .min(1, "The giving information is required.")
+    .max(500),
+
+  href: z.string().trim().max(1000).optional(),
+
+  icon: z.enum(["EMAIL", "MAIL", "CHURCH"]),
+
+  sortOrder: z.coerce.number().int().min(0).max(9999),
+});
+
+const giveWaysTitleSchema = z.object({
+  giveWaysTitle: z
+    .string()
+    .trim()
+    .min(1, "The section title is required.")
+    .max(150),
+});
+
+const giveThankYouSchema = z.object({
+  giveThanksTitle: z
+    .string()
+    .trim()
+    .min(1, "The section title is required.")
+    .max(150, "The section title is too long."),
+
+  giveThanksBody: z
+    .string()
+    .trim()
+    .min(1, "The thank-you message is required.")
+    .max(1500, "The thank-you message is too long."),
+});
+
 const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"] as const;
 
 const maximumImageSize = 4 * 1024 * 1024;
@@ -1166,5 +1244,255 @@ export async function updateEventsHero(formData: FormData) {
   });
 
   revalidatePath("/events");
+  revalidatePath("/admin");
+}
+export async function updateGiveHero(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the Give page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the Give page.");
+  }
+
+  const parsed = giveHeroSchema.safeParse({
+    giveHeroTitle: formData.get("giveHeroTitle"),
+    giveHeroSubtitle: formData.get("giveHeroSubtitle"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The Give page header is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      giveHeroTitle: parsed.data.giveHeroTitle,
+      giveHeroSubtitle: parsed.data.giveHeroSubtitle,
+    },
+
+    create: {
+      id: 1,
+      giveHeroTitle: parsed.data.giveHeroTitle,
+      giveHeroSubtitle: parsed.data.giveHeroSubtitle,
+    },
+  });
+
+  revalidatePath("/give");
+  revalidatePath("/admin");
+}
+export async function updateGiveScripture(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the Give page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the Give page.");
+  }
+
+  const parsed = giveScriptureSchema.safeParse({
+    giveVerseReference: formData.get("giveVerseReference"),
+    giveVerseText: formData.get("giveVerseText"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The Scripture section is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      giveVerseReference: parsed.data.giveVerseReference,
+
+      giveVerseText: parsed.data.giveVerseText,
+    },
+
+    create: {
+      id: 1,
+
+      giveVerseReference: parsed.data.giveVerseReference,
+
+      giveVerseText: parsed.data.giveVerseText,
+    },
+  });
+
+  revalidatePath("/give");
+  revalidatePath("/admin");
+}
+
+export async function updateGiveWaysTitle(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to edit the Give page.");
+  }
+
+  const parsed = giveWaysTitleSchema.safeParse({
+    giveWaysTitle: formData.get("giveWaysTitle"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The section title is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      giveWaysTitle: parsed.data.giveWaysTitle,
+    },
+
+    create: {
+      id: 1,
+      giveWaysTitle: parsed.data.giveWaysTitle,
+    },
+  });
+
+  revalidatePath("/give");
+  revalidatePath("/admin");
+}
+
+export async function saveGivingMethod(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to manage giving methods.");
+  }
+
+  const parsed = givingMethodSchema.safeParse({
+    methodId: formData.get("methodId") || undefined,
+    title: formData.get("title"),
+    description: formData.get("description"),
+    detail: formData.get("detail"),
+    href: formData.get("href") || undefined,
+    icon: formData.get("icon"),
+    sortOrder: formData.get("sortOrder"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The giving method is invalid.",
+    );
+  }
+
+  const data = {
+    title: parsed.data.title,
+    description: parsed.data.description,
+    detail: parsed.data.detail,
+    href: parsed.data.href || null,
+    icon: parsed.data.icon,
+    sortOrder: parsed.data.sortOrder,
+    published: formData.get("published") === "on",
+  };
+
+  if (parsed.data.methodId) {
+    await db.givingMethod.update({
+      where: {
+        id: parsed.data.methodId,
+      },
+      data,
+    });
+  } else {
+    await db.givingMethod.create({
+      data,
+    });
+  }
+
+  revalidatePath("/give");
+  revalidatePath("/admin");
+}
+
+export async function deleteGivingMethod(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in.");
+  }
+
+  if (session.user.role !== "ADMIN") {
+    throw new Error("Only administrators can delete giving methods.");
+  }
+
+  const methodId = formData.get("methodId");
+
+  if (typeof methodId !== "string" || !methodId) {
+    throw new Error("The giving method ID is missing.");
+  }
+
+  await db.givingMethod.delete({
+    where: {
+      id: methodId,
+    },
+  });
+
+  revalidatePath("/give");
+  revalidatePath("/admin");
+}
+export async function updateGiveThankYou(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the Give page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the Give page.");
+  }
+
+  const parsed = giveThankYouSchema.safeParse({
+    giveThanksTitle: formData.get("giveThanksTitle"),
+    giveThanksBody: formData.get("giveThanksBody"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The thank-you section is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      giveThanksTitle: parsed.data.giveThanksTitle,
+      giveThanksBody: parsed.data.giveThanksBody,
+    },
+
+    create: {
+      id: 1,
+      giveThanksTitle: parsed.data.giveThanksTitle,
+      giveThanksBody: parsed.data.giveThanksBody,
+    },
+  });
+
+  revalidatePath("/give");
   revalidatePath("/admin");
 }

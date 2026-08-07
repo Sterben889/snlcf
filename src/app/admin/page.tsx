@@ -19,6 +19,10 @@ import { StatementOfFaithAdminSection } from "./components/StatementOfFaithAdmin
 import { LeadershipTeamAdminSection } from "./components/LeadershipTeamAdminSection";
 import { AboutCallToActionAdminSection } from "./components/AboutCallToActionAdminSection";
 import { EventsPageAdminSection } from "./components/EventsPageAdminSection";
+import { GivePageAdminSection } from "./components/GivePageAdminSection";
+import { GiveScriptureAdminSection } from "./components/GiveScriptureAdminSection";
+import { GiveWaysAdminSection } from "./components/GiveWaysAdminSection";
+import { GiveThankYouAdminSection } from "./components/GiveThankYouAdminSection";
 
 export const dynamic = "force-dynamic";
 
@@ -554,6 +558,10 @@ export default async function AdminPage() {
             <LeadershipTeamAdminSection />
             <AboutCallToActionAdminSection />
             <EventsPageAdminSection />
+            <GivePageAdminSection />
+            <GiveScriptureAdminSection />
+            <GiveWaysAdminSection />
+            <GiveThankYouAdminSection />
           </div>
         </div>
       </div>

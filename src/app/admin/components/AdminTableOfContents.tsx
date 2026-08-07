@@ -65,6 +65,29 @@ const editorGroups = [
       },
     ],
   },
+
+  {
+    id: "give-page-group",
+    label: "Give Page",
+    sections: [
+      {
+        id: "give-page-header-editor",
+        label: "Page Header",
+      },
+      {
+        id: "give-scripture-editor",
+        label: "Scripture",
+      },
+      {
+        id: "give-ways-editor",
+        label: "Ways of Giving",
+      },
+      {
+        id: "give-thank-you-editor",
+        label: "Thank You",
+      },
+    ],
+  },
 ] as const;
 
 function ChevronIcon() {
