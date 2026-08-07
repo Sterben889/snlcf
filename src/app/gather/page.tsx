@@ -3,6 +3,7 @@ import { GatherHeroSection } from "~/app/_components/GatherHeroSection";
 import { getSiteContent } from "~/server/site-content";
 import { GatherWaysSection } from "../_components/GatherWaysSection";
 import { CopyrightFooter } from "../_components/CopyrightFooter";
+import { GatherCallToActionSection } from "../_components/GatherCallToActionSection";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,13 @@ export default async function GatherPage() {
       />
 
       <GatherWaysSection title={content.gatherWaysTitle} />
+
+      <GatherCallToActionSection
+        title={content.gatherCtaTitle}
+        body={content.gatherCtaBody}
+        eventsButtonText={content.gatherCtaEventsText}
+        aboutButtonText={content.gatherCtaAboutText}
+      />
 
       <CopyrightFooter />
     </main>

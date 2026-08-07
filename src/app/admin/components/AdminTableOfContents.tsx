@@ -101,6 +101,10 @@ const editorGroups = [
         id: "gather-ways-editor",
         label: "Ways to Gather",
       },
+      {
+        id: "gather-cta-editor",
+        label: "Final Call to Action",
+      },
     ],
   },
 ] as const;

@@ -456,6 +456,32 @@ const gatherWaysTitleSchema = z.object({
     .max(150),
 });
 
+const gatherCtaSchema = z.object({
+  gatherCtaTitle: z
+    .string()
+    .trim()
+    .min(1, "The CTA title is required.")
+    .max(150, "The CTA title is too long."),
+
+  gatherCtaBody: z
+    .string()
+    .trim()
+    .min(1, "The CTA message is required.")
+    .max(1500, "The CTA message is too long."),
+
+  gatherCtaEventsText: z
+    .string()
+    .trim()
+    .min(1, "The Events button text is required.")
+    .max(100),
+
+  gatherCtaAboutText: z
+    .string()
+    .trim()
+    .min(1, "The About button text is required.")
+    .max(100),
+});
+
 const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"] as const;
 
 const maximumImageSize = 4 * 1024 * 1024;
@@ -1876,6 +1902,55 @@ export async function deleteGatherGroup(formData: FormData) {
       console.error("Unable to remove Gather images from Blob storage:", error);
     }
   }
+
+  revalidatePath("/gather");
+  revalidatePath("/admin");
+}
+export async function updateGatherCallToAction(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the Gather page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the Gather page.");
+  }
+
+  const parsed = gatherCtaSchema.safeParse({
+    gatherCtaTitle: formData.get("gatherCtaTitle"),
+    gatherCtaBody: formData.get("gatherCtaBody"),
+    gatherCtaEventsText: formData.get("gatherCtaEventsText"),
+    gatherCtaAboutText: formData.get("gatherCtaAboutText"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ??
+        "The Gather call-to-action section is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      gatherCtaTitle: parsed.data.gatherCtaTitle,
+      gatherCtaBody: parsed.data.gatherCtaBody,
+      gatherCtaEventsText: parsed.data.gatherCtaEventsText,
+      gatherCtaAboutText: parsed.data.gatherCtaAboutText,
+    },
+
+    create: {
+      id: 1,
+      gatherCtaTitle: parsed.data.gatherCtaTitle,
+      gatherCtaBody: parsed.data.gatherCtaBody,
+      gatherCtaEventsText: parsed.data.gatherCtaEventsText,
+      gatherCtaAboutText: parsed.data.gatherCtaAboutText,
+    },
+  });
 
   revalidatePath("/gather");
   revalidatePath("/admin");

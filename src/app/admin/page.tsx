@@ -25,6 +25,7 @@ import { GiveWaysAdminSection } from "./components/GiveWaysAdminSection";
 import { GiveThankYouAdminSection } from "./components/GiveThankYouAdminSection";
 import { GatherPageAdminSection } from "./components/GatherPageAdminSection";
 import { GatherWaysAdminSection } from "./components/GatherWaysAdminSection";
+import { GatherCallToActionAdminSection } from "./components/GatherCallToActionAdminSection";
 
 export const dynamic = "force-dynamic";
 
@@ -566,6 +567,7 @@ export default async function AdminPage() {
             <GiveThankYouAdminSection />
             <GatherPageAdminSection />
             <GatherWaysAdminSection />
+            <GatherCallToActionAdminSection />
           </div>
         </div>
       </div>

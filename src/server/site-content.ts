@@ -94,6 +94,15 @@ export const defaultSiteContent = {
     "There's a place for you at our table. Find a gathering to connect, grow, and belong.",
 
   gatherWaysTitle: "Ways to Gather",
+
+  gatherCtaTitle: "We Can't Wait to Meet You",
+
+  gatherCtaBody:
+    "Whether it's your first time or you've been around a while, there's a place for you here. Come and gather with us.",
+
+  gatherCtaEventsText: "See Upcoming Events",
+
+  gatherCtaAboutText: "Learn About Us",
 };
 
 export async function getSiteContent() {

@@ -145,6 +145,11 @@ model SiteContent {
   gatherHeroSubtitle String @default("There's a place for you at our table. Find a gathering to connect, grow, and belong.")
 
   gatherWaysTitle String @default("Ways to Gather")
+
+  gatherCtaTitle      String @default("We Can't Wait to Meet You")
+  gatherCtaBody       String @default("Whether it's your first time or you've been around a while, there's a place for you here. Come and gather with us.")
+  gatherCtaEventsText String @default("See Upcoming Events")
+  gatherCtaAboutText  String @default("Learn About Us")
 }
 
 enum EventRecurrence {
