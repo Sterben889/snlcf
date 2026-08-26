@@ -150,6 +150,21 @@ model SiteContent {
   gatherCtaBody       String @default("Whether it's your first time or you've been around a while, there's a place for you here. Come and gather with us.")
   gatherCtaEventsText String @default("See Upcoming Events")
   gatherCtaAboutText  String @default("Learn About Us")
+
+  serveHeroTitle    String @default("Join the Team")
+  serveHeroSubtitle String @default("Use your gifts and passions to make a difference!")
+
+  serveIntroTitle String @default("You Were Made for This")
+  serveIntroBody  String @default("God has created you to make a difference in the lives of those around you, and we believe real fulfillment comes when you live with greater purpose using YOUR unique gifts! We're all different, but we all have a place on the team. We'd love to help you discover your best fit.")
+
+  serveMinistriesTitle String @default("Where You Can Serve")
+
+  serveCtaEyebrow    String @default("NOT SURE WHERE TO START?")
+  serveCtaTitle      String @default("Let's find your fit together.")
+  serveCtaBody       String @default("You don't need to have it all figured out. We'd love to help you explore the different ways you can serve and discover where your gifts fit best.")
+  serveCtaButtonText String @default("Find Your Fit")
+  serveCtaButtonUrl  String @default("https://docs.google.com/forms/d/e/1FAIpQLSfbm8OMz8uNuUzK48sxgqysPKmv5wsjavHjepfwrnOpKH7QCw/viewform?usp=header")
+  serveCtaImageUrl   String @default("")
 }
 
 enum EventRecurrence {
@@ -246,4 +261,17 @@ model GatherGroupImage {
   group   GatherGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@index([groupId, sortOrder])
+}
+
+model ServeMinistry {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  imageUrl    String?
+  sortOrder   Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sortOrder])
 }

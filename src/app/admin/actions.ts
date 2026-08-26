@@ -482,6 +482,92 @@ const gatherCtaSchema = z.object({
     .max(100),
 });
 
+const serveHeroSchema = z.object({
+  serveHeroTitle: z
+    .string()
+    .trim()
+    .min(1, "The Serve page title is required.")
+    .max(150, "The Serve page title is too long."),
+
+  serveHeroSubtitle: z
+    .string()
+    .trim()
+    .min(1, "The Serve page subtitle is required.")
+    .max(500, "The Serve page subtitle is too long."),
+});
+
+const serveIntroSchema = z.object({
+  serveIntroTitle: z
+    .string()
+    .trim()
+    .min(1, "The section title is required.")
+    .max(150, "The section title is too long."),
+
+  serveIntroBody: z
+    .string()
+    .trim()
+    .min(1, "The section message is required.")
+    .max(2000, "The section message is too long."),
+});
+
+const serveMinistrySchema = z.object({
+  ministryId: z.string().trim().optional(),
+
+  title: z
+    .string()
+    .trim()
+    .min(1, "The ministry name is required.")
+    .max(150, "The ministry name is too long."),
+
+  description: z
+    .string()
+    .trim()
+    .min(1, "The ministry description is required.")
+    .max(3000, "The ministry description is too long."),
+
+  sortOrder: z.coerce
+    .number()
+    .int("Display order must be a whole number.")
+    .min(0)
+    .max(9999),
+});
+
+const serveMinistriesTitleSchema = z.object({
+  serveMinistriesTitle: z
+    .string()
+    .trim()
+    .min(1, "The section title is required.")
+    .max(150),
+});
+
+const serveCtaSchema = z.object({
+  serveCtaEyebrow: z
+    .string()
+    .trim()
+    .min(1, "The small heading is required.")
+    .max(100),
+
+  serveCtaTitle: z
+    .string()
+    .trim()
+    .min(1, "The section title is required.")
+    .max(150),
+
+  serveCtaBody: z
+    .string()
+    .trim()
+    .min(1, "The section message is required.")
+    .max(2000),
+
+  serveCtaButtonText: z
+    .string()
+    .trim()
+    .min(1, "The button text is required.")
+    .max(100),
+
+  serveCtaButtonUrl: z.string().trim().url("Enter a valid URL.").max(1500),
+});
+
 const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"] as const;
 
 const maximumImageSize = 4 * 1024 * 1024;
@@ -1953,5 +2039,422 @@ export async function updateGatherCallToAction(formData: FormData) {
   });
 
   revalidatePath("/gather");
+  revalidatePath("/admin");
+}
+export async function updateServeHero(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the Serve page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the Serve page.");
+  }
+
+  const parsed = serveHeroSchema.safeParse({
+    serveHeroTitle: formData.get("serveHeroTitle"),
+    serveHeroSubtitle: formData.get("serveHeroSubtitle"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The Serve page header is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      serveHeroTitle: parsed.data.serveHeroTitle,
+
+      serveHeroSubtitle: parsed.data.serveHeroSubtitle,
+    },
+
+    create: {
+      id: 1,
+
+      serveHeroTitle: parsed.data.serveHeroTitle,
+
+      serveHeroSubtitle: parsed.data.serveHeroSubtitle,
+    },
+  });
+
+  revalidatePath("/serve");
+  revalidatePath("/admin");
+}
+export async function updateServeIntro(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the Serve page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the Serve page.");
+  }
+
+  const parsed = serveIntroSchema.safeParse({
+    serveIntroTitle: formData.get("serveIntroTitle"),
+    serveIntroBody: formData.get("serveIntroBody"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ??
+        "The Serve introduction section is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      serveIntroTitle: parsed.data.serveIntroTitle,
+      serveIntroBody: parsed.data.serveIntroBody,
+    },
+
+    create: {
+      id: 1,
+      serveIntroTitle: parsed.data.serveIntroTitle,
+      serveIntroBody: parsed.data.serveIntroBody,
+    },
+  });
+
+  revalidatePath("/serve");
+  revalidatePath("/admin");
+}
+export async function updateServeMinistriesTitle(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the Serve page.");
+  }
+
+  const parsed = serveMinistriesTitleSchema.safeParse({
+    serveMinistriesTitle: formData.get("serveMinistriesTitle"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The section title is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      serveMinistriesTitle: parsed.data.serveMinistriesTitle,
+    },
+
+    create: {
+      id: 1,
+      serveMinistriesTitle: parsed.data.serveMinistriesTitle,
+    },
+  });
+
+  revalidatePath("/serve");
+  revalidatePath("/admin");
+}
+export async function saveServeMinistry(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to manage ministries.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to manage ministries.");
+  }
+
+  const parsed = serveMinistrySchema.safeParse({
+    ministryId: formData.get("ministryId") || undefined,
+
+    title: formData.get("title"),
+
+    description: formData.get("description"),
+
+    sortOrder: formData.get("sortOrder"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The ministry information is invalid.",
+    );
+  }
+
+  const existingMinistry = parsed.data.ministryId
+    ? await db.serveMinistry.findUnique({
+        where: {
+          id: parsed.data.ministryId,
+        },
+      })
+    : null;
+
+  let imageUrl = existingMinistry?.imageUrl ?? null;
+
+  if (formData.get("removeImage") === "on") {
+    if (imageUrl) {
+      try {
+        await del(imageUrl);
+      } catch (error) {
+        console.error("Unable to delete ministry image:", error);
+      }
+    }
+
+    imageUrl = null;
+  }
+
+  const image = formData.get("image");
+
+  if (image instanceof File && image.size > 0) {
+    if (
+      !acceptedImageTypes.includes(
+        image.type as (typeof acceptedImageTypes)[number],
+      )
+    ) {
+      throw new Error("The image must be a JPG, PNG, or WebP file.");
+    }
+
+    if (image.size > maximumImageSize) {
+      throw new Error(
+        "The ministry image is larger than the permitted upload size.",
+      );
+    }
+
+    if (!env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN is missing from the environment.");
+    }
+
+    const previousImageUrl = imageUrl;
+
+    const safeFilename = image.name
+      .replace(/[^a-zA-Z0-9._-]/g, "-")
+      .toLowerCase();
+
+    const blob = await put(`serve/${safeFilename}`, image, {
+      access: "public",
+      addRandomSuffix: true,
+    });
+
+    imageUrl = blob.url;
+
+    if (previousImageUrl) {
+      try {
+        await del(previousImageUrl);
+      } catch (error) {
+        console.error("Unable to delete old ministry image:", error);
+      }
+    }
+  }
+
+  const data = {
+    title: parsed.data.title,
+    description: parsed.data.description,
+    imageUrl,
+    sortOrder: parsed.data.sortOrder,
+    published: formData.get("published") === "on",
+  };
+
+  if (parsed.data.ministryId) {
+    await db.serveMinistry.update({
+      where: {
+        id: parsed.data.ministryId,
+      },
+      data,
+    });
+  } else {
+    await db.serveMinistry.create({
+      data,
+    });
+  }
+
+  revalidatePath("/serve");
+  revalidatePath("/admin");
+}
+export async function deleteServeMinistry(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in.");
+  }
+
+  if (session.user.role !== "ADMIN") {
+    throw new Error("Only administrators can delete ministries.");
+  }
+
+  const ministryId = formData.get("ministryId");
+
+  if (typeof ministryId !== "string" || ministryId.length === 0) {
+    throw new Error("The ministry ID is missing.");
+  }
+
+  const ministry = await db.serveMinistry.findUnique({
+    where: {
+      id: ministryId,
+    },
+  });
+
+  if (!ministry) {
+    throw new Error("The ministry could not be found.");
+  }
+
+  await db.serveMinistry.delete({
+    where: {
+      id: ministryId,
+    },
+  });
+
+  if (ministry.imageUrl) {
+    try {
+      await del(ministry.imageUrl);
+    } catch (error) {
+      console.error("Unable to delete ministry image:", error);
+    }
+  }
+
+  revalidatePath("/serve");
+  revalidatePath("/admin");
+}
+
+export async function updateServeCallToAction(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the Serve page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to update the Serve page.");
+  }
+
+  const parsed = serveCtaSchema.safeParse({
+    serveCtaEyebrow: formData.get("serveCtaEyebrow"),
+    serveCtaTitle: formData.get("serveCtaTitle"),
+    serveCtaBody: formData.get("serveCtaBody"),
+    serveCtaButtonText: formData.get("serveCtaButtonText"),
+    serveCtaButtonUrl: formData.get("serveCtaButtonUrl"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ??
+        "The Serve call-to-action section is invalid.",
+    );
+  }
+
+  const existingContent = await db.siteContent.findUnique({
+    where: {
+      id: 1,
+    },
+    select: {
+      serveCtaImageUrl: true,
+    },
+  });
+
+  let imageUrl = existingContent?.serveCtaImageUrl ?? "";
+
+  const removeImage = formData.get("removeImage") === "on";
+
+  if (removeImage && imageUrl) {
+    try {
+      await del(imageUrl);
+    } catch (error) {
+      console.error("Unable to remove Serve CTA image:", error);
+    }
+
+    imageUrl = "";
+  }
+
+  const image = formData.get("serveCtaImage");
+
+  if (image instanceof File && image.size > 0) {
+    if (
+      !acceptedImageTypes.includes(
+        image.type as (typeof acceptedImageTypes)[number],
+      )
+    ) {
+      throw new Error("The image must be a JPG, PNG, or WebP file.");
+    }
+
+    if (image.size > maximumImageSize) {
+      throw new Error("The image is larger than the permitted upload size.");
+    }
+
+    if (!env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN is missing from the environment.");
+    }
+
+    const previousImageUrl = imageUrl;
+
+    const safeFilename = image.name
+      .replace(/[^a-zA-Z0-9._-]/g, "-")
+      .toLowerCase();
+
+    const blob = await put(`serve/cta/${safeFilename}`, image, {
+      access: "public",
+      addRandomSuffix: true,
+    });
+
+    imageUrl = blob.url;
+
+    if (previousImageUrl) {
+      try {
+        await del(previousImageUrl);
+      } catch (error) {
+        console.error("Unable to delete previous Serve CTA image:", error);
+      }
+    }
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      serveCtaEyebrow: parsed.data.serveCtaEyebrow,
+
+      serveCtaTitle: parsed.data.serveCtaTitle,
+
+      serveCtaBody: parsed.data.serveCtaBody,
+
+      serveCtaButtonText: parsed.data.serveCtaButtonText,
+
+      serveCtaButtonUrl: parsed.data.serveCtaButtonUrl,
+
+      serveCtaImageUrl: imageUrl,
+    },
+
+    create: {
+      id: 1,
+
+      serveCtaEyebrow: parsed.data.serveCtaEyebrow,
+
+      serveCtaTitle: parsed.data.serveCtaTitle,
+
+      serveCtaBody: parsed.data.serveCtaBody,
+
+      serveCtaButtonText: parsed.data.serveCtaButtonText,
+
+      serveCtaButtonUrl: parsed.data.serveCtaButtonUrl,
+
+      serveCtaImageUrl: imageUrl,
+    },
+  });
+
+  revalidatePath("/serve");
   revalidatePath("/admin");
 }

@@ -23,6 +23,10 @@ const navigationLinks = [
     href: "/events",
   },
   {
+    label: "Serve",
+    href: "/serve",
+  },
+  {
     label: "Give",
     href: "/give",
   },
@@ -44,6 +48,7 @@ export default function Navbar() {
     pathname.startsWith("/about") ||
     pathname.startsWith("/gather") ||
     pathname.startsWith("/events") ||
+    pathname.startsWith("/serve") ||
     pathname.startsWith("/give");
 
   /*

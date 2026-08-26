@@ -107,6 +107,29 @@ const editorGroups = [
       },
     ],
   },
+
+  {
+    id: "serve-page-group",
+    label: "Serve Page",
+    sections: [
+      {
+        id: "serve-page-header-editor",
+        label: "Page Header",
+      },
+      {
+        id: "serve-intro-editor",
+        label: "Introduction",
+      },
+      {
+        id: "serve-ministries-editor",
+        label: "Where You Can Serve",
+      },
+      {
+        id: "serve-cta-editor",
+        label: "Find Your Fit",
+      },
+    ],
+  },
 ] as const;
 
 function ChevronIcon() {

@@ -26,6 +26,10 @@ import { GiveThankYouAdminSection } from "./components/GiveThankYouAdminSection"
 import { GatherPageAdminSection } from "./components/GatherPageAdminSection";
 import { GatherWaysAdminSection } from "./components/GatherWaysAdminSection";
 import { GatherCallToActionAdminSection } from "./components/GatherCallToActionAdminSection";
+import { ServePageAdminSection } from "./components/ServePageAdminSection";
+import { ServeIntroAdminSection } from "./components/ServeIntroAdminSection";
+import { ServeMinistriesAdminSection } from "./components/ServeMinistriesAdminSection";
+import { ServeCallToActionAdminSection } from "./components/ServeCallToActionAdminSection";
 
 export const dynamic = "force-dynamic";
 
@@ -568,6 +572,10 @@ export default async function AdminPage() {
             <GatherPageAdminSection />
             <GatherWaysAdminSection />
             <GatherCallToActionAdminSection />
+            <ServePageAdminSection />
+            <ServeIntroAdminSection />
+            <ServeMinistriesAdminSection />
+            <ServeCallToActionAdminSection />
           </div>
         </div>
       </div>

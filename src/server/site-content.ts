@@ -103,6 +103,31 @@ export const defaultSiteContent = {
   gatherCtaEventsText: "See Upcoming Events",
 
   gatherCtaAboutText: "Learn About Us",
+
+  serveHeroTitle: "Join the Team",
+
+  serveHeroSubtitle: "Use your gifts and passions to make a difference!",
+
+  serveIntroTitle: "You Were Made for This",
+
+  serveMinistriesTitle: "Where You Can Serve",
+
+  serveIntroBody:
+    "God has created you to make a difference in the lives of those around you, and we believe real fulfillment comes when you live with greater purpose using YOUR unique gifts! We're all different, but we all have a place on the team. We'd love to help you discover your best fit.",
+
+  serveCtaEyebrow: "NOT SURE WHERE TO START?",
+
+  serveCtaTitle: "Let's find your fit together.",
+
+  serveCtaBody:
+    "You don't need to have it all figured out. We'd love to help you explore the different ways you can serve and discover where your gifts fit best.",
+
+  serveCtaButtonText: "Find Your Fit",
+
+  serveCtaButtonUrl:
+    "https://docs.google.com/forms/d/e/1FAIpQLSfbm8OMz8uNuUzK48sxgqysPKmv5wsjavHjepfwrnOpKH7QCw/viewform?usp=header",
+
+  serveCtaImageUrl: "",
 };
 
 export async function getSiteContent() {
