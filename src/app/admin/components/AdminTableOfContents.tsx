@@ -136,6 +136,25 @@ const editorGroups = [
       },
     ],
   },
+
+  {
+    id: "discipleship-page-group",
+    label: "Discipleship Page",
+    sections: [
+      {
+        id: "discipleship-page-header-editor",
+        label: "Page Header",
+      },
+      {
+        id: "discipleship-testimonies-editor",
+        label: "Testimonies",
+      },
+      {
+        id: "discipleship-next-steps-editor",
+        label: "Next Steps",
+      },
+    ],
+  },
 ] as const;
 
 function ChevronIcon({ open }: { open: boolean }) {

@@ -165,6 +165,46 @@ model SiteContent {
   serveCtaButtonText String @default("Find Your Fit")
   serveCtaButtonUrl  String @default("https://docs.google.com/forms/d/e/1FAIpQLSfbm8OMz8uNuUzK48sxgqysPKmv5wsjavHjepfwrnOpKH7QCw/viewform?usp=header")
   serveCtaImageUrl   String @default("")
+
+  discipleshipHeroEyebrow  String @default("GROW TOGETHER")
+  discipleshipHeroTitle    String @default("Discipleship is a life we live together.")
+  discipleshipHeroSubtitle String @default("Following Jesus is not a solo journey. Find meaningful community, take your next step, and discover how God can work through your story.")
+
+  discipleshipTestimoniesEyebrow String @default("STORIES OF GRACE")
+  discipleshipTestimoniesTitle   String @default("Testimonies")
+  discipleshipTestimoniesIntro   String @default("Real stories from people discovering the transforming love of Jesus in everyday life.")
+
+  discipleshipExploreEyebrow    String @default("KEEP EXPLORING")
+  discipleshipExploreTitle      String @default("Your story matters here.")
+  discipleshipExploreBody       String @default("Discipleship looks different for everyone. Find community, ask questions, and take your next step with people who will walk alongside you.")
+  discipleshipExploreButtonText String @default("Explore discipleship")
+
+  discipleshipNextEyebrow String @default("YOUR NEXT STEP")
+  discipleshipNextTitle   String @default("There is a place for you to grow.")
+
+  // Card 1
+  discipleshipCard1Eyebrow String @default("FIND COMMUNITY")
+  discipleshipCard1Title   String @default("Join a small group")
+  discipleshipCard1Body    String @default("A small group is a welcoming circle of people who meet regularly to build friendships, study Scripture, pray, and encourage one another through everyday life.\n\nNot sure where to start? We would love to help you find a group that fits your season of life.")
+  discipleshipCard1Contact String @default("Ministry Contact")
+  discipleshipCard1Email   String @default("info@saskatoonnewlife.ca")
+  discipleshipCard1Phone   String @default("(306) 683-1950")
+
+  // Card 2
+  discipleshipCard2Eyebrow String @default("TAKE YOUR NEXT STEP")
+  discipleshipCard2Title   String @default("Baptism")
+  discipleshipCard2Body    String @default("Baptism is a public expression of your faith in Jesus: a meaningful step of obedience and a celebration with your church family.\n\nIf you are considering baptism or want to learn more, our team is ready to walk with you.")
+  discipleshipCard2Contact String @default("Ministry Contact")
+  discipleshipCard2Email   String @default("info@saskatoonnewlife.ca")
+  discipleshipCard2Phone   String @default("(306) 683-1950")
+
+  // Card 3
+  discipleshipCard3Eyebrow String @default("LIVE SENT")
+  discipleshipCard3Title   String @default("Mission involvements")
+  discipleshipCard3Body    String @default("We partner with people and organizations that are bringing hope, practical care, and the good news of Jesus to our city and around the world.\n\nThere are many ways to participate through prayer, generosity, serving, and going.")
+  discipleshipCard3Contact String @default("Ministry Contact")
+  discipleshipCard3Email   String @default("info@saskatoonnewlife.ca")
+  discipleshipCard3Phone   String @default("(306) 683-1950")
 }
 
 enum EventRecurrence {
@@ -274,4 +314,27 @@ model ServeMinistry {
   updatedAt   DateTime @updatedAt
 
   @@index([sortOrder])
+}
+
+model Testimony {
+  id   String @id @default(cuid())
+  slug String @unique
+
+  kicker      String
+  title       String
+  summary     String
+  authorLine  String
+  body        String
+  closingText String?
+
+  imageUrl String?
+
+  sortOrder Int     @default(0)
+  published Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder])
+  @@index([published])
 }

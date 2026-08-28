@@ -568,6 +568,114 @@ const serveCtaSchema = z.object({
   serveCtaButtonUrl: z.string().trim().url("Enter a valid URL.").max(1500),
 });
 
+const discipleshipHeroSchema = z.object({
+  discipleshipHeroEyebrow: z
+    .string()
+    .trim()
+    .min(1, "The small heading is required.")
+    .max(100, "The small heading is too long."),
+
+  discipleshipHeroTitle: z
+    .string()
+    .trim()
+    .min(1, "The Discipleship page title is required.")
+    .max(200, "The Discipleship page title is too long."),
+
+  discipleshipHeroSubtitle: z
+    .string()
+    .trim()
+    .min(1, "The Discipleship page subtitle is required.")
+    .max(1000, "The Discipleship page subtitle is too long."),
+});
+
+const testimonySchema = z.object({
+  testimonyId: z.string().trim().optional(),
+
+  kicker: z.string().trim().min(1, "The story heading is required.").max(150),
+
+  title: z.string().trim().min(1, "The testimony title is required.").max(250),
+
+  summary: z
+    .string()
+    .trim()
+    .min(1, "The testimony summary is required.")
+    .max(1500),
+
+  authorLine: z.string().trim().min(1, "The author line is required.").max(250),
+
+  body: z.string().trim().min(1, "The full testimony is required.").max(15000),
+
+  closingText: z.string().trim().max(2000).optional(),
+
+  sortOrder: z.coerce.number().int().min(0).max(9999),
+});
+
+const discipleshipTestimonyHeadingSchema = z.object({
+  discipleshipTestimoniesEyebrow: z.string().trim().min(1).max(100),
+
+  discipleshipTestimoniesTitle: z.string().trim().min(1).max(150),
+
+  discipleshipTestimoniesIntro: z.string().trim().min(1).max(1000),
+
+  discipleshipExploreEyebrow: z.string().trim().min(1).max(100),
+
+  discipleshipExploreTitle: z.string().trim().min(1).max(200),
+
+  discipleshipExploreBody: z.string().trim().min(1).max(1500),
+
+  discipleshipExploreButtonText: z.string().trim().min(1).max(100),
+});
+
+const discipleshipNextStepsSchema = z.object({
+  discipleshipNextEyebrow: z.string().trim().min(1).max(100),
+
+  discipleshipNextTitle: z.string().trim().min(1).max(200),
+
+  discipleshipCard1Eyebrow: z.string().trim().min(1).max(100),
+
+  discipleshipCard1Title: z.string().trim().min(1).max(150),
+
+  discipleshipCard1Body: z.string().trim().min(1).max(3000),
+
+  discipleshipCard1Contact: z.string().trim().min(1).max(150),
+
+  discipleshipCard1Email: z
+    .string()
+    .trim()
+    .email("Enter a valid email address."),
+
+  discipleshipCard1Phone: z.string().trim().min(1).max(50),
+
+  discipleshipCard2Eyebrow: z.string().trim().min(1).max(100),
+
+  discipleshipCard2Title: z.string().trim().min(1).max(150),
+
+  discipleshipCard2Body: z.string().trim().min(1).max(3000),
+
+  discipleshipCard2Contact: z.string().trim().min(1).max(150),
+
+  discipleshipCard2Email: z
+    .string()
+    .trim()
+    .email("Enter a valid email address."),
+
+  discipleshipCard2Phone: z.string().trim().min(1).max(50),
+
+  discipleshipCard3Eyebrow: z.string().trim().min(1).max(100),
+
+  discipleshipCard3Title: z.string().trim().min(1).max(150),
+
+  discipleshipCard3Body: z.string().trim().min(1).max(3000),
+
+  discipleshipCard3Contact: z.string().trim().min(1).max(150),
+
+  discipleshipCard3Email: z
+    .string()
+    .trim()
+    .email("Enter a valid email address."),
+
+  discipleshipCard3Phone: z.string().trim().min(1).max(50),
+});
 const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"] as const;
 
 const maximumImageSize = 4 * 1024 * 1024;
@@ -2456,5 +2564,412 @@ export async function updateServeCallToAction(formData: FormData) {
   });
 
   revalidatePath("/serve");
+  revalidatePath("/admin");
+}
+export async function updateDiscipleshipHero(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the Discipleship page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error(
+      "You do not have permission to update the Discipleship page.",
+    );
+  }
+
+  const parsed = discipleshipHeroSchema.safeParse({
+    discipleshipHeroEyebrow: formData.get("discipleshipHeroEyebrow"),
+
+    discipleshipHeroTitle: formData.get("discipleshipHeroTitle"),
+
+    discipleshipHeroSubtitle: formData.get("discipleshipHeroSubtitle"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ??
+        "The Discipleship page header is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: {
+      discipleshipHeroEyebrow: parsed.data.discipleshipHeroEyebrow,
+
+      discipleshipHeroTitle: parsed.data.discipleshipHeroTitle,
+
+      discipleshipHeroSubtitle: parsed.data.discipleshipHeroSubtitle,
+    },
+
+    create: {
+      id: 1,
+
+      discipleshipHeroEyebrow: parsed.data.discipleshipHeroEyebrow,
+
+      discipleshipHeroTitle: parsed.data.discipleshipHeroTitle,
+
+      discipleshipHeroSubtitle: parsed.data.discipleshipHeroSubtitle,
+    },
+  });
+
+  revalidatePath("/discipleship");
+  revalidatePath("/admin");
+}
+function createSlug(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+async function createUniqueTestimonySlug(title: string) {
+  const baseSlug = createSlug(title) || "testimony";
+
+  let slug = baseSlug;
+  let suffix = 2;
+
+  while (
+    await db.testimony.findUnique({
+      where: {
+        slug,
+      },
+      select: {
+        id: true,
+      },
+    })
+  ) {
+    slug = `${baseSlug}-${suffix}`;
+    suffix += 1;
+  }
+
+  return slug;
+}
+export async function updateDiscipleshipTestimonyContent(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error(
+      "You do not have permission to edit the Discipleship page.",
+    );
+  }
+
+  const parsed = discipleshipTestimonyHeadingSchema.safeParse({
+    discipleshipTestimoniesEyebrow: formData.get(
+      "discipleshipTestimoniesEyebrow",
+    ),
+
+    discipleshipTestimoniesTitle: formData.get("discipleshipTestimoniesTitle"),
+
+    discipleshipTestimoniesIntro: formData.get("discipleshipTestimoniesIntro"),
+
+    discipleshipExploreEyebrow: formData.get("discipleshipExploreEyebrow"),
+
+    discipleshipExploreTitle: formData.get("discipleshipExploreTitle"),
+
+    discipleshipExploreBody: formData.get("discipleshipExploreBody"),
+
+    discipleshipExploreButtonText: formData.get(
+      "discipleshipExploreButtonText",
+    ),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The testimony section is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: parsed.data,
+
+    create: {
+      id: 1,
+      ...parsed.data,
+    },
+  });
+
+  revalidatePath("/discipleship");
+  revalidatePath("/admin");
+}
+export async function saveTestimony(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to manage testimonies.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error("You do not have permission to manage testimonies.");
+  }
+
+  const parsed = testimonySchema.safeParse({
+    testimonyId: formData.get("testimonyId") || undefined,
+
+    kicker: formData.get("kicker"),
+
+    title: formData.get("title"),
+
+    summary: formData.get("summary"),
+
+    authorLine: formData.get("authorLine"),
+
+    body: formData.get("body"),
+
+    closingText: formData.get("closingText") || undefined,
+
+    sortOrder: formData.get("sortOrder"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The testimony is invalid.",
+    );
+  }
+
+  const existing = parsed.data.testimonyId
+    ? await db.testimony.findUnique({
+        where: {
+          id: parsed.data.testimonyId,
+        },
+      })
+    : null;
+
+  if (parsed.data.testimonyId && !existing) {
+    throw new Error("The testimony could not be found.");
+  }
+
+  let imageUrl = existing?.imageUrl ?? null;
+
+  if (formData.get("removeImage") === "on" && imageUrl) {
+    try {
+      await del(imageUrl);
+    } catch (error) {
+      console.error("Unable to remove testimony image:", error);
+    }
+
+    imageUrl = null;
+  }
+
+  const image = formData.get("image");
+
+  if (image instanceof File && image.size > 0) {
+    if (
+      !acceptedImageTypes.includes(
+        image.type as (typeof acceptedImageTypes)[number],
+      )
+    ) {
+      throw new Error("The image must be JPG, PNG, or WebP.");
+    }
+
+    if (image.size > maximumImageSize) {
+      throw new Error("The testimony image is too large.");
+    }
+
+    if (!env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN is missing.");
+    }
+
+    const previousImage = imageUrl;
+
+    const safeFilename = image.name
+      .replace(/[^a-zA-Z0-9._-]/g, "-")
+      .toLowerCase();
+
+    const blob = await put(`discipleship/testimonies/${safeFilename}`, image, {
+      access: "public",
+      addRandomSuffix: true,
+    });
+
+    imageUrl = blob.url;
+
+    if (previousImage) {
+      try {
+        await del(previousImage);
+      } catch (error) {
+        console.error("Unable to remove previous testimony image:", error);
+      }
+    }
+  }
+
+  const data = {
+    kicker: parsed.data.kicker,
+    title: parsed.data.title,
+    summary: parsed.data.summary,
+    authorLine: parsed.data.authorLine,
+    body: parsed.data.body,
+
+    closingText: parsed.data.closingText || null,
+
+    imageUrl,
+
+    sortOrder: parsed.data.sortOrder,
+
+    published: formData.get("published") === "on",
+  };
+
+  let testimonySlug: string;
+
+  if (existing) {
+    await db.testimony.update({
+      where: {
+        id: existing.id,
+      },
+
+      data,
+    });
+
+    testimonySlug = existing.slug;
+  } else {
+    const slug = await createUniqueTestimonySlug(parsed.data.title);
+
+    await db.testimony.create({
+      data: {
+        ...data,
+        slug,
+      },
+    });
+
+    testimonySlug = slug;
+  }
+
+  revalidatePath("/discipleship");
+  revalidatePath(`/discipleship/testimonies/${testimonySlug}`);
+  revalidatePath("/admin");
+}
+export async function deleteTestimony(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in.");
+  }
+
+  if (session.user.role !== "ADMIN") {
+    throw new Error("Only administrators can delete testimonies.");
+  }
+
+  const testimonyId = formData.get("testimonyId");
+
+  if (typeof testimonyId !== "string" || !testimonyId) {
+    throw new Error("The testimony ID is missing.");
+  }
+
+  const testimony = await db.testimony.findUnique({
+    where: {
+      id: testimonyId,
+    },
+  });
+
+  if (!testimony) {
+    throw new Error("The testimony could not be found.");
+  }
+
+  await db.testimony.delete({
+    where: {
+      id: testimony.id,
+    },
+  });
+
+  if (testimony.imageUrl) {
+    try {
+      await del(testimony.imageUrl);
+    } catch (error) {
+      console.error("Unable to remove testimony image:", error);
+    }
+  }
+
+  revalidatePath("/discipleship");
+  revalidatePath("/admin");
+}
+export async function updateDiscipleshipNextSteps(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to update the Discipleship page.");
+  }
+
+  if (session.user.role !== "ADMIN" && session.user.role !== "EDITOR") {
+    throw new Error(
+      "You do not have permission to update the Discipleship page.",
+    );
+  }
+
+  const parsed = discipleshipNextStepsSchema.safeParse({
+    discipleshipNextEyebrow: formData.get("discipleshipNextEyebrow"),
+
+    discipleshipNextTitle: formData.get("discipleshipNextTitle"),
+
+    discipleshipCard1Eyebrow: formData.get("discipleshipCard1Eyebrow"),
+
+    discipleshipCard1Title: formData.get("discipleshipCard1Title"),
+
+    discipleshipCard1Body: formData.get("discipleshipCard1Body"),
+
+    discipleshipCard1Contact: formData.get("discipleshipCard1Contact"),
+
+    discipleshipCard1Email: formData.get("discipleshipCard1Email"),
+
+    discipleshipCard1Phone: formData.get("discipleshipCard1Phone"),
+
+    discipleshipCard2Eyebrow: formData.get("discipleshipCard2Eyebrow"),
+
+    discipleshipCard2Title: formData.get("discipleshipCard2Title"),
+
+    discipleshipCard2Body: formData.get("discipleshipCard2Body"),
+
+    discipleshipCard2Contact: formData.get("discipleshipCard2Contact"),
+
+    discipleshipCard2Email: formData.get("discipleshipCard2Email"),
+
+    discipleshipCard2Phone: formData.get("discipleshipCard2Phone"),
+
+    discipleshipCard3Eyebrow: formData.get("discipleshipCard3Eyebrow"),
+
+    discipleshipCard3Title: formData.get("discipleshipCard3Title"),
+
+    discipleshipCard3Body: formData.get("discipleshipCard3Body"),
+
+    discipleshipCard3Contact: formData.get("discipleshipCard3Contact"),
+
+    discipleshipCard3Email: formData.get("discipleshipCard3Email"),
+
+    discipleshipCard3Phone: formData.get("discipleshipCard3Phone"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "The next steps section is invalid.",
+    );
+  }
+
+  await db.siteContent.upsert({
+    where: {
+      id: 1,
+    },
+
+    update: parsed.data,
+
+    create: {
+      id: 1,
+      ...parsed.data,
+    },
+  });
+
+  revalidatePath("/discipleship");
   revalidatePath("/admin");
 }

@@ -30,6 +30,9 @@ import { ServePageAdminSection } from "./components/ServePageAdminSection";
 import { ServeIntroAdminSection } from "./components/ServeIntroAdminSection";
 import { ServeMinistriesAdminSection } from "./components/ServeMinistriesAdminSection";
 import { ServeCallToActionAdminSection } from "./components/ServeCallToActionAdminSection";
+import { DiscipleshipPageAdminSection } from "./components/DiscipleshipPageAdminSection";
+import { DiscipleshipTestimoniesAdminSection } from "./components/DiscipleshipTestimoniesAdminSection";
+import { DiscipleshipNextStepsAdminSection } from "./components/DiscipleshipNextStepsAdminSection";
 
 export const dynamic = "force-dynamic";
 
@@ -576,6 +579,9 @@ export default async function AdminPage() {
             <ServeIntroAdminSection />
             <ServeMinistriesAdminSection />
             <ServeCallToActionAdminSection />
+            <DiscipleshipPageAdminSection />
+            <DiscipleshipTestimoniesAdminSection />
+            <DiscipleshipNextStepsAdminSection />
           </div>
         </div>
       </div>

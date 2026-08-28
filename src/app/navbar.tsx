@@ -19,6 +19,10 @@ const navigationLinks = [
     href: "/gather",
   },
   {
+    label: "Discipleship",
+    href: "/discipleship",
+  },
+  {
     label: "Events",
     href: "/events",
   },
@@ -47,6 +51,7 @@ export default function Navbar() {
   const useLightNavbar =
     pathname.startsWith("/about") ||
     pathname.startsWith("/gather") ||
+    pathname.startsWith("/discipleship") ||
     pathname.startsWith("/events") ||
     pathname.startsWith("/serve") ||
     pathname.startsWith("/give");

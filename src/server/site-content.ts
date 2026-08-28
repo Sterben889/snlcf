@@ -128,6 +128,72 @@ export const defaultSiteContent = {
     "https://docs.google.com/forms/d/e/1FAIpQLSfbm8OMz8uNuUzK48sxgqysPKmv5wsjavHjepfwrnOpKH7QCw/viewform?usp=header",
 
   serveCtaImageUrl: "",
+
+  discipleshipHeroEyebrow: "GROW TOGETHER",
+
+  discipleshipHeroTitle: "Discipleship is a life we live together.",
+
+  discipleshipHeroSubtitle:
+    "Following Jesus is not a solo journey. Find meaningful community, take your next step, and discover how God can work through your story.",
+
+  discipleshipTestimoniesEyebrow: "STORIES OF GRACE",
+
+  discipleshipTestimoniesTitle: "Testimonies",
+
+  discipleshipTestimoniesIntro:
+    "Real stories from people discovering the transforming love of Jesus in everyday life.",
+
+  discipleshipExploreEyebrow: "KEEP EXPLORING",
+
+  discipleshipExploreTitle: "Your story matters here.",
+
+  discipleshipExploreBody:
+    "Discipleship looks different for everyone. Find community, ask questions, and take your next step with people who will walk alongside you.",
+
+  discipleshipExploreButtonText: "Explore discipleship",
+
+  discipleshipNextEyebrow: "YOUR NEXT STEP",
+
+  discipleshipNextTitle: "There is a place for you to grow.",
+
+  discipleshipCard1Eyebrow: "FIND COMMUNITY",
+
+  discipleshipCard1Title: "Join a small group",
+
+  discipleshipCard1Body:
+    "A small group is a welcoming circle of people who meet regularly to build friendships, study Scripture, pray, and encourage one another through everyday life.\n\nNot sure where to start? We would love to help you find a group that fits your season of life.",
+
+  discipleshipCard1Contact: "Ministry Contact",
+
+  discipleshipCard1Email: "info@saskatoonnewlife.ca",
+
+  discipleshipCard1Phone: "(306) 683-1950",
+
+  discipleshipCard2Eyebrow: "TAKE YOUR NEXT STEP",
+
+  discipleshipCard2Title: "Baptism",
+
+  discipleshipCard2Body:
+    "Baptism is a public expression of your faith in Jesus: a meaningful step of obedience and a celebration with your church family.\n\nIf you are considering baptism or want to learn more, our team is ready to walk with you.",
+
+  discipleshipCard2Contact: "Ministry Contact",
+
+  discipleshipCard2Email: "info@saskatoonnewlife.ca",
+
+  discipleshipCard2Phone: "(306) 683-1950",
+
+  discipleshipCard3Eyebrow: "LIVE SENT",
+
+  discipleshipCard3Title: "Mission involvements",
+
+  discipleshipCard3Body:
+    "We partner with people and organizations that are bringing hope, practical care, and the good news of Jesus to our city and around the world.\n\nThere are many ways to participate through prayer, generosity, serving, and going.",
+
+  discipleshipCard3Contact: "Ministry Contact",
+
+  discipleshipCard3Email: "info@saskatoonnewlife.ca",
+
+  discipleshipCard3Phone: "(306) 683-1950",
 };
 
 export async function getSiteContent() {

@@ -72,7 +72,7 @@ export async function LeadershipTeamSection() {
     <section className="bg-gray-50 px-4 py-16 text-blue-950 sm:px-6 lg:py-24">
       <div className="mx-auto max-w-6xl">
         <h2 className="text-center text-3xl font-bold tracking-tight sm:text-4xl">
-          Leadership Team
+          Our Staff
         </h2>
 
         {members.length > 0 ? (
