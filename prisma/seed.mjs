@@ -53,3 +53,41 @@ try {
 } finally {
   await prisma.$disconnect();
 }
+const secondAdminName = process.env.SECOND_ADMIN_NAME?.trim();
+
+const secondAdminEmail = process.env.SECOND_ADMIN_EMAIL?.trim().toLowerCase();
+
+const secondAdminPassword = process.env.SECOND_ADMIN_PASSWORD;
+
+if (secondAdminName && secondAdminEmail && secondAdminPassword) {
+  const secondAdminPasswordHash = await hash(secondAdminPassword, 12);
+
+  const secondAdmin = await prisma.user.upsert({
+    where: {
+      email: secondAdminEmail,
+    },
+
+    update: {
+      name: secondAdminName,
+      passwordHash: secondAdminPasswordHash,
+      role: "ADMIN",
+      active: true,
+    },
+
+    create: {
+      name: secondAdminName,
+      email: secondAdminEmail,
+      passwordHash: secondAdminPasswordHash,
+      role: "ADMIN",
+      active: true,
+    },
+  });
+
+  console.log("Second administrator ready:");
+  console.log({
+    id: secondAdmin.id,
+    name: secondAdmin.name,
+    email: secondAdmin.email,
+    role: secondAdmin.role,
+  });
+}
